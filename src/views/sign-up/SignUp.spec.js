@@ -11,4 +11,30 @@ describe('sign up', () => {
 
     expect(header).toBeInTheDocument()
   })
+
+  it('has username input', () => {
+    const { container } = render(SignUp)
+
+    // expect(container.querySelector('input')).toBeInTheDocument()
+    // querySelector => same way as css
+
+    // expect(screen.queryByPlaceholderText('Username')).toBeInTheDocument()
+    expect(screen.queryByLabelText('Username')).toBeInTheDocument()
+  })
+
+  it('has email input', () => {
+    const { container } = render(SignUp)
+
+    // expect(container.querySelector('input[type="email"]')).toBeInTheDocument()
+    // querySelector => same way as css
+
+    // expect(screen.queryByPlaceholderText('E-mail')).toBeInTheDocument()
+    expect(screen.queryByLabelText('E-mail')).toBeInTheDocument()
+  })
 })
+
+// https://testing-library.com/docs/queries/about
+// getBy vs queryBy
+// must read
+
+
