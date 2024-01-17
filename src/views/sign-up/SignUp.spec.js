@@ -1,10 +1,14 @@
-vi.mock('axios') // to test api calls
-import { render, screen } from '@testing-library/vue'
+// vi.mock('axios') // to test api calls
+// if the above line is not commented the test with msw will fail
+import { render, screen, waitFor } from '@testing-library/vue'
 import { describe, it, expect, vi } from 'vitest'
 
 import SignUp from './SignUp.vue'
 import userEvent from '@testing-library/user-event'
 import axios from 'axios'
+
+import { setupServer } from 'msw/node'
+import { HttpResponse, http } from 'msw'
 
 describe('sign up', () => {
   it('has signup header', () => {
@@ -80,6 +84,16 @@ describe('sign up', () => {
 
   describe('when user submits form', () => {
     it('sends username email and password to the backend', async () => {
+      let requestBody
+      const server = setupServer(
+        http.post('/api/vi/users', async ({ request }) => {
+          requestBody = await request.json()
+          return HttpResponse.json({})
+        })
+      )
+
+      server.listen()
+
       const user = userEvent.setup()
 
       render(SignUp)
@@ -96,10 +110,18 @@ describe('sign up', () => {
       await user.type(passwordRepeat, 'asdf')
       await user.click(signUpButton)
 
-      expect(axios.post).toHaveBeenCalledWith('api/vi/users', {
-        username: 'test_user',
-        email: 'text@example.com',
-        password: 'asdf'
+      // expect(axios.post).toHaveBeenCalledWith('/api/vi/users', {
+      //   username: 'test_user',
+      //   email: 'text@example.com',
+      //   password: 'asdf'
+      // })
+
+      await waitFor(() => {
+        expect(requestBody).toEqual({
+          username: 'test_user',
+          email: 'text@example.com',
+          password: 'asdf'
+        })
       })
     })
   })
@@ -108,3 +130,6 @@ describe('sign up', () => {
 // https://testing-library.com/docs/queries/about
 // getBy vs queryBy
 // must read
+
+// if we use any library other than axios for api call the this test wont work for this we need
+// mock service worker. => sets up a mock server for testing.

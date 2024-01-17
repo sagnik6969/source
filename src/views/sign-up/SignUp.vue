@@ -47,7 +47,7 @@ const disabled = computed(() => {
 })
 
 const submit = () => {
-  axios.post('api/vi/users', {
+  axios.post('/api/vi/users', {
     username: formState.username,
     email: formState.email,
     password: formState.password
