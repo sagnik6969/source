@@ -3,10 +3,10 @@
 // import { mount } from '@vue/test-utils'
 import HelloWorld from '../HelloWorld.vue'
 import { render, screen } from '@testing-library/vue'
-import * as matchers from '@testing-library/jest-dom/matchers'
-
-expect.extend(matchers);
+// import * as matchers from '@testing-library/jest-dom/matchers'
+// expect.extend(matchers);
 // to use matchers
+// the above code is moved to ./setupTest.js
 
 describe('HelloWorld', () => {
 

@@ -9,8 +9,13 @@ export default mergeConfig(
       environment: 'jsdom',
       exclude: [...configDefaults.exclude, 'e2e/*'],
       root: fileURLToPath(new URL('./', import.meta.url)),
-      globals:true 
+      globals:true, 
       // so that we don't need to import vitest in every test file 
+      setupFiles:[
+        './setupTest.js'
+        // so that we don't need to include the files
+        // in that we don't need to expect.extend(matchers) in every file
+      ]
     }
   })
 )
