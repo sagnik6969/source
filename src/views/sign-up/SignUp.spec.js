@@ -1,8 +1,10 @@
+vi.mock('axios') // to test api calls
 import { render, screen } from '@testing-library/vue'
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 
 import SignUp from './SignUp.vue'
 import userEvent from '@testing-library/user-event'
+import axios from 'axios'
 
 describe('sign up', () => {
   it('has signup header', () => {
@@ -73,6 +75,32 @@ describe('sign up', () => {
 
       const signUpButton = screen.getByRole('button', { name: 'Sign up' })
       expect(signUpButton).toBeEnabled()
+    })
+  })
+
+  describe('when user submits form', () => {
+    it('sends username email and password to the backend', async () => {
+      const user = userEvent.setup()
+
+      render(SignUp)
+
+      const userName = screen.getByLabelText('Username')
+      const email = screen.getByLabelText('E-mail')
+      const password = screen.getByLabelText('Password')
+      const passwordRepeat = screen.getByLabelText('Password Repeat')
+      const signUpButton = screen.getByRole('button', { name: 'Sign up' })
+
+      await user.type(userName, 'test_user')
+      await user.type(email, 'text@example.com')
+      await user.type(password, 'asdf')
+      await user.type(passwordRepeat, 'asdf')
+      await user.click(signUpButton)
+
+      expect(axios.post).toHaveBeenCalledWith('api/vi/users', {
+        username: 'test_user',
+        email: 'text@example.com',
+        password: 'asdf'
+      })
     })
   })
 })
