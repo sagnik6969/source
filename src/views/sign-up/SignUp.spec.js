@@ -2,6 +2,7 @@ import { render, screen } from '@testing-library/vue'
 import { describe, it, expect } from 'vitest'
 
 import SignUp from './SignUp.vue'
+import userEvent from '@testing-library/user-event'
 
 describe('sign up', () => {
   it('has signup header', () => {
@@ -47,16 +48,32 @@ describe('sign up', () => {
     expect(screen.queryByLabelText('Password Repeat')).toHaveAttribute('type', 'password')
   })
 
-  it('has sign up button',()=>{
+  it('has sign up button', () => {
     render(SignUp)
-    const signUpButton = screen.getByRole('button',{'name':'Sign up'});
-    expect(signUpButton).toBeInTheDocument();
+    const signUpButton = screen.getByRole('button', { name: 'Sign up' })
+    expect(signUpButton).toBeInTheDocument()
   })
 
-  it('has sign up button disabled initially',()=>{
+  it('has sign up button disabled initially', () => {
     render(SignUp)
-    const signUpButton = screen.getByRole('button',{'name':'Sign up'});
-    expect(signUpButton).toBeDisabled();
+    const signUpButton = screen.getByRole('button', { name: 'Sign up' })
+    expect(signUpButton).toBeDisabled()
+  })
+
+  describe('when user sets same value for passwords inputs', () => {
+    it('enable buttons', async () => {
+      const user = userEvent.setup()
+      render(SignUp)
+
+      const password = screen.queryByLabelText('Password')
+      const passwordRepeat = screen.queryByLabelText('Password Repeat')
+
+      await user.type(password, 'asdf')
+      await user.type(passwordRepeat, 'asdf')
+
+      const signUpButton = screen.getByRole('button', { name: 'Sign up' })
+      expect(signUpButton).toBeEnabled()
+    })
   })
 })
 

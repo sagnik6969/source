@@ -10,13 +10,23 @@
   </div>
   <div>
     <label for="password">Password</label>
-    <input id="password" placeholder="Password" type="password" />
+    <input id="password" v-model="password" placeholder="Password" type="password" />
   </div>
   <div>
     <label for="passwordRepeat">Password Repeat</label>
-    <input id="passwordRepeat" placeholder="Password" type="password" />
+    <input id="passwordRepeat" v-model="passwordRepeat" placeholder="Password" type="password" />
   </div>
   <div>
-    <button disabled>Sign up</button>
+    <button :disabled="disabled">Sign up</button>
   </div>
 </template>
+
+<script setup>
+import { computed, ref, watch } from 'vue'
+
+const password = ref('')
+const passwordRepeat = ref('')
+const disabled = computed(() => {
+  return password.value === '' || password.value !== passwordRepeat.value
+})
+</script>
