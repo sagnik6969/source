@@ -20,7 +20,7 @@ describe('Sign Up', () => {
         await user.type(passwordRepeatInput, 'P4ssword')
         const button = screen.getByRole('button', { name: 'Sign up' })
         await user.click(button)
-        expect(axios.post).toHaveBeenCalledWith('/api/vi/users', {
+        expect(axios.post).toHaveBeenCalledWith('/api/v1/users', {
           username: 'user1',
           email: 'user1@mail.com',
           password: 'P4ssword'

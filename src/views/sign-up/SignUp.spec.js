@@ -86,7 +86,7 @@ describe('sign up', () => {
     it('sends username email and password to the backend', async () => {
       let requestBody
       const server = setupServer(
-        http.post('/api/vi/users', async ({ request }) => {
+        http.post('/api/v1/users', async ({ request }) => {
           requestBody = await request.json()
           return HttpResponse.json({})
         })
