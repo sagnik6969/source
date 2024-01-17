@@ -1,29 +1,31 @@
 <template>
   <h1>Sign Up</h1>
-  <div>
-    <label for="username">Username</label>
-    <input v-model="formState.username" id="username" placeholder="Username" type="email" />
-  </div>
-  <div>
-    <label for="email">E-mail</label>
-    <input v-model="formState.email" id="email" placeholder="E-mail" type="email" />
-  </div>
-  <div>
-    <label for="password">Password</label>
-    <input id="password" v-model="formState.password" placeholder="Password" type="password" />
-  </div>
-  <div>
-    <label for="passwordRepeat">Password Repeat</label>
-    <input
-      id="passwordRepeat"
-      v-model="formState.passwordRepeat"
-      placeholder="Password"
-      type="password"
-    />
-  </div>
-  <div>
-    <button :disabled="disabled" @click="submit">Sign up</button>
-  </div>
+  <form @submit.prevent="submit">
+    <div>
+      <label for="username">Username</label>
+      <input v-model="formState.username" id="username" placeholder="Username" type="text" />
+    </div>
+    <div>
+      <label for="email">E-mail</label>
+      <input v-model="formState.email" id="email" placeholder="E-mail" type="email" />
+    </div>
+    <div>
+      <label for="password">Password</label>
+      <input id="password" v-model="formState.password" placeholder="Password" type="password" />
+    </div>
+    <div>
+      <label for="passwordRepeat">Password Repeat</label>
+      <input
+        id="passwordRepeat"
+        v-model="formState.passwordRepeat"
+        placeholder="Password"
+        type="password"
+      />
+    </div>
+    <div>
+      <button :disabled="disabled">Sign up</button>
+    </div>
+  </form>
 </template>
 
 <script setup>
