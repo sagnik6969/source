@@ -1,12 +1,25 @@
 import { describe, expect, it } from 'vitest'
 
-import { mount } from '@vue/test-utils'
+// import { mount } from '@vue/test-utils'
 import HelloWorld from '../HelloWorld.vue'
+import { render, screen } from '@testing-library/vue'
 
 describe('HelloWorld', () => {
+
   it('renders properly', () => {
-    const wrapper = mount(HelloWorld, { props: { msg: 'Hello Vitest' } })
-    expect(wrapper.text()).toContain('Hello Vitest')
+  
+    // const wrapper = mount(HelloWorld, { props: { msg: 'Hello Vitest' } })
+    // expect(wrapper.text()).toContain('Hello Vitest')
+     
+    render(HelloWorld,{ props: { msg: 'Hello Vitest' } });
+    // render is similar to mount function
+
+    const element = screen.getByText('Hello Vitest');
+    // returns an html element 
+
+    expect(element).toBeTruthy();
+  
+  
   })
 })
 
