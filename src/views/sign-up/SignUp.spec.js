@@ -31,10 +31,35 @@ describe('sign up', () => {
     // expect(screen.queryByPlaceholderText('E-mail')).toBeInTheDocument()
     expect(screen.queryByLabelText('E-mail')).toBeInTheDocument()
   })
+
+  it('has password input', () => {
+    render(SignUp)
+    expect(screen.queryByLabelText('Password')).toBeInTheDocument()
+  })
+
+  it('has password type for password input', () => {
+    render(SignUp)
+    expect(screen.queryByLabelText('Password')).toHaveAttribute('type', 'password')
+  })
+
+  it('has password type for password repeat input', () => {
+    render(SignUp)
+    expect(screen.queryByLabelText('Password Repeat')).toHaveAttribute('type', 'password')
+  })
+
+  it('has sign up button',()=>{
+    render(SignUp)
+    const signUpButton = screen.getByRole('button',{'name':'Sign up'});
+    expect(signUpButton).toBeInTheDocument();
+  })
+
+  it('has sign up button disabled initially',()=>{
+    render(SignUp)
+    const signUpButton = screen.getByRole('button',{'name':'Sign up'});
+    expect(signUpButton).toBeDisabled();
+  })
 })
 
 // https://testing-library.com/docs/queries/about
 // getBy vs queryBy
 // must read
-
-
