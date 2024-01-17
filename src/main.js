@@ -12,3 +12,7 @@ app.use(createPinia())
 app.use(router)
 
 app.mount('#app')
+
+// test file name is same as component name followed by .spec.js
+// npm run test:unit => to run tests
+
