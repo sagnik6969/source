@@ -1,14 +1,52 @@
 // vi.mock('axios') // to test api calls
 // if the above line is not commented the test with msw will fail
 import { render, screen, waitFor } from '@testing-library/vue'
-import { describe, it, expect, vi, assert } from 'vitest'
-
+import { describe, it, expect, vi, assert, beforeEach, beforeAll, afterAll } from 'vitest'
 import SignUp from './SignUp.vue'
 import userEvent from '@testing-library/user-event'
-import axios from 'axios'
-
 import { setupServer } from 'msw/node'
 import { HttpResponse, http } from 'msw'
+
+let requestBody
+let counter = 0
+const server = setupServer(
+  http.post('/api/v1/users', async ({ request }) => {
+    requestBody = await request.json()
+    counter += 1
+    return HttpResponse.json({})
+  })
+)
+
+beforeEach(() => {
+  counter = 0
+})
+
+beforeAll(() => server.listen())
+
+afterAll(() => server.close())
+
+const setup = async () => {
+  const user = userEvent.setup()
+  const result = render(SignUp)
+  const userName = screen.getByLabelText('Username')
+  const email = screen.getByLabelText('E-mail')
+  const password = screen.getByLabelText('Password')
+  const passwordRepeat = screen.getByLabelText('Password Repeat')
+  const signUpButton = screen.getByRole('button', { name: 'Sign up' })
+
+  await user.type(userName, 'test_user')
+  await user.type(email, 'text@example.com')
+  await user.type(password, 'asdf')
+  await user.type(passwordRepeat, 'asdf')
+
+  return {
+    ...result,
+    user,
+    elements: {
+      signUpButton
+    }
+  }
+}
 
 describe('sign up', () => {
   it('has signup header', () => {
@@ -84,37 +122,12 @@ describe('sign up', () => {
 
   describe('when user submits form', () => {
     it('sends username email and password to the backend', async () => {
-      let requestBody
-      const server = setupServer(
-        http.post('/api/v1/users', async ({ request }) => {
-          requestBody = await request.json()
-          return HttpResponse.json({})
-        })
-      )
+      const {
+        user,
+        elements: { signUpButton }
+      } = await setup()
 
-      server.listen()
-
-      const user = userEvent.setup()
-
-      render(SignUp)
-
-      const userName = screen.getByLabelText('Username')
-      const email = screen.getByLabelText('E-mail')
-      const password = screen.getByLabelText('Password')
-      const passwordRepeat = screen.getByLabelText('Password Repeat')
-      const signUpButton = screen.getByRole('button', { name: 'Sign up' })
-
-      await user.type(userName, 'test_user')
-      await user.type(email, 'text@example.com')
-      await user.type(password, 'asdf')
-      await user.type(passwordRepeat, 'asdf')
       await user.click(signUpButton)
-
-      // expect(axios.post).toHaveBeenCalledWith('/api/vi/users', {
-      //   username: 'test_user',
-      //   email: 'text@example.com',
-      //   password: 'asdf'
-      // })
 
       await waitFor(() => {
         expect(requestBody).toEqual({
@@ -123,46 +136,21 @@ describe('sign up', () => {
           password: 'asdf'
         })
       })
-
-      server.close()
-      // so that the server does not affect next tests.
     })
 
     describe('when there is an ongoing api call', () => {
       it('does not allow clicking the button', async () => {
-        let counter = 0
+        const {
+          user,
+          elements: { signUpButton }
+        } = await setup()
 
-        const server = setupServer(
-          http.post('/api/v1/users', ({ request }) => {
-            counter++
-            return HttpResponse.json({})
-          })
-        )
-
-        server.listen()
-
-        const user = userEvent.setup()
-
-        render(SignUp)
-
-        const userName = screen.getByLabelText('Username')
-        const email = screen.getByLabelText('E-mail')
-        const password = screen.getByLabelText('Password')
-        const passwordRepeat = screen.getByLabelText('Password Repeat')
-        const signUpButton = screen.getByRole('button', { name: 'Sign up' })
-
-        await user.type(userName, 'test_user')
-        await user.type(email, 'text@example.com')
-        await user.type(password, 'asdf')
-        await user.type(passwordRepeat, 'asdf')
         await user.click(signUpButton)
         await user.click(signUpButton)
 
         await waitFor(() => {
           expect(counter).toBe(1)
         })
-
-        server.close()
       })
     })
   })
