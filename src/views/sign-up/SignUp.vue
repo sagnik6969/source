@@ -12,7 +12,7 @@
         v-if="!successMessage"
       >
         <!-- data-testid => used for testing -->
-        <div class="form-group">
+        <!-- <div class="form-group">
           <label class="form-label" for="username">Username</label>
           <input
             class="form-control"
@@ -22,7 +22,13 @@
             type="text"
           />
           <div class="text-danger">{{ errors.username }}</div>
-        </div>
+        </div> -->
+        <AppInput
+          id="username"
+          v-model="formState.username"
+          label="Username"
+          :help="errors.username"
+        />
         <div class="form-group">
           <label class="form-label" for="email">E-mail</label>
           <input
@@ -73,6 +79,7 @@
 <script setup>
 import axios from 'axios'
 import { computed, reactive, ref, watch } from 'vue'
+import AppInput from '../../components/AppInput.vue'
 
 // const password = ref('')
 // const passwordRepeat = ref('')
