@@ -47,7 +47,14 @@
           />
         </div>
         <div class="form-group">
-          <button class="btn btn-primary" :disabled="disabled">Sign up</button>
+          <button class="btn btn-primary" :disabled="disabled">
+            <span
+              v-if="apiProcessing"
+              role="status"
+              class="spinner-border spinner-border-sm"
+            ></span>
+            Sign up
+          </button>
         </div>
       </form>
     </div>

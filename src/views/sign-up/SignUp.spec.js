@@ -104,6 +104,12 @@ describe('sign up', () => {
     expect(signUpButton).toBeDisabled()
   })
 
+  it('does not have spinner', () => {
+    render(SignUp)
+    expect(screen.queryByRole('status')).not.toBeInTheDocument()
+    // spinner has a role attribute.
+  })
+
   describe('when user sets same value for passwords inputs', () => {
     it('enable buttons', async () => {
       const user = userEvent.setup()
@@ -151,6 +157,17 @@ describe('sign up', () => {
         await waitFor(() => {
           expect(counter).toBe(1)
         })
+      })
+
+      it('displays spinner', async () => {
+        const {
+          user,
+          elements: { signUpButton }
+        } = await setup()
+
+        await user.click(signUpButton)
+
+        expect(screen.getByRole('status')).toBeInTheDocument()
       })
     })
   })
