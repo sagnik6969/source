@@ -1,5 +1,5 @@
 vi.mock('axios')
-import { render, screen } from '@testing-library/vue'
+import { render, screen, waitFor } from '@testing-library/vue'
 import SignUp from './SignUp.vue'
 import userEvent from '@testing-library/user-event'
 import axios from 'axios'
@@ -77,6 +77,105 @@ describe('Sign Up', () => {
           await user.click(signUpButton)
 
           expect(axios.post).toHaveBeenCalledTimes(1)
+        })
+        it('displays spinner', async () => {
+          axios.post.mockImplementation(() => {
+            return new Promise((resolve) => {
+              setTimeout(() => {
+                resolve({ data: {} })
+              }, 1000)
+            })
+          })
+
+          const {
+            user,
+            elements: { signUpButton }
+          } = await setup()
+
+          await user.click(signUpButton)
+
+          expect(screen.getByRole('status')).toBeInTheDocument()
+        })
+      })
+
+      describe('when success response is received', () => {
+        beforeEach(() => {
+          axios.post.mockResolvedValue({ data: { message: 'User create success' } })
+        })
+
+        it('displays message received from backend', async () => {
+          const {
+            user,
+            elements: { signUpButton }
+          } = await setup()
+
+          await user.click(signUpButton)
+          const text = await screen.findByText('User create success')
+          // findByText => asynchronous function
+          // by default waits for 1s for the element to appear.
+          expect(text).toBeInTheDocument()
+        })
+
+        it('hides signup form', async () => {
+          const {
+            user,
+            elements: { signUpButton }
+          } = await setup()
+
+          await user.click(signUpButton)
+
+          await waitFor(() => {
+            expect(screen.queryByTestId('form-sign-up')).not.toBeInTheDocument()
+          })
+        })
+      })
+
+      describe('when there is a network error', () => {
+        beforeEach(() => {
+          axios.post.mockRejectedValue({})
+        })
+
+        it('displays Unexpected error occurred, please try again', async () => {
+          const {
+            user,
+            elements: { signUpButton }
+          } = await setup()
+
+          await user.click(signUpButton)
+
+          const text = await screen.findByText('Unexpected error occurred, please try again')
+          expect(text).toBeInTheDocument()
+        })
+
+        it('hides the spinner', async () => {
+          const {
+            user,
+            elements: { signUpButton }
+          } = await setup()
+
+          await user.click(signUpButton)
+
+          expect(screen.queryByRole('status')).not.toBeInTheDocument()
+        })
+
+        describe('when user submits again', () => {
+          it('hides the error when api request in progress', async () => {
+            axios.post.mockRejectedValueOnce({}).mockResolvedValue({ data: {} })
+            // first time it will reject the promise after that it will resolve the promise
+            const {
+              user,
+              elements: { signUpButton }
+            } = await setup()
+
+            user.click(signUpButton)
+            const text = await screen.findByText('Unexpected error occurred, please try again')
+
+            user.click(signUpButton)
+
+            await waitFor(() => {
+              expect(text).not.toBeInTheDocument()
+            })
+          })
         })
       })
     })
