@@ -1,6 +1,6 @@
 // vi.mock('axios') // to test api calls
 // if the above line is not commented the test with msw will fail
-import { render, screen, waitFor } from '@testing-library/vue'
+import { findByText, render, screen, waitFor } from '@testing-library/vue'
 import { describe, it, expect, vi, assert, beforeEach, beforeAll, afterAll } from 'vitest'
 import SignUp from './SignUp.vue'
 import userEvent from '@testing-library/user-event'
@@ -13,7 +13,7 @@ const server = setupServer(
   http.post('/api/v1/users', async ({ request }) => {
     requestBody = await request.json()
     counter += 1
-    return HttpResponse.json({})
+    return HttpResponse.json({ message: 'User create success' })
   })
 )
 
@@ -168,6 +168,21 @@ describe('sign up', () => {
         await user.click(signUpButton)
 
         expect(screen.getByRole('status')).toBeInTheDocument()
+      })
+    })
+
+    describe('when success response is received', () => {
+      it('displays message received from backend', async () => {
+        const {
+          user,
+          elements: { signUpButton }
+        } = await setup()
+
+        await user.click(signUpButton)
+        const text = await screen.findByText('User create success')
+        // findByText => asynchronous function
+        // by default waits for 1s for the element to appear.
+        expect(text).toBeInTheDocument()
       })
     })
   })

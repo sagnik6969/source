@@ -56,6 +56,7 @@
             Sign up
           </button>
         </div>
+        <div v-if="successMessage" class="alert alert-success">{{ successMessage }}</div>
       </form>
     </div>
   </div>
@@ -78,6 +79,7 @@ const formState = reactive({
 })
 
 const apiProcessing = ref(false)
+const successMessage = ref('')
 
 const disabled = computed(() => {
   return (
@@ -87,12 +89,14 @@ const disabled = computed(() => {
   )
 })
 
-const submit = () => {
+const submit = async () => {
   apiProcessing.value = true
-  axios.post('/api/v1/users', {
+  const response = await axios.post('/api/v1/users', {
     username: formState.username,
     email: formState.email,
     password: formState.password
   })
+
+  successMessage.value = response.data.message
 }
 </script>
