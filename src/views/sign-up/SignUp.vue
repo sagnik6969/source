@@ -70,11 +70,18 @@ const formState = reactive({
   email: ''
 })
 
+const apiProcessing = ref(false)
+
 const disabled = computed(() => {
-  return formState.password === '' || formState.password !== formState.passwordRepeat
+  return (
+    apiProcessing.value ||
+    formState.password === '' ||
+    formState.password !== formState.passwordRepeat
+  )
 })
 
 const submit = () => {
+  apiProcessing.value = true
   axios.post('/api/v1/users', {
     username: formState.username,
     email: formState.email,
