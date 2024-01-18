@@ -64,6 +64,7 @@
         </div>
       </form>
       <div v-else class="alert alert-success">{{ successMessage }}</div>
+      <div v-if="errorMessage" class="alert alert-success">{{ errorMessage }}</div>
     </div>
   </div>
 </template>
@@ -86,6 +87,7 @@ const formState = reactive({
 
 const apiProcessing = ref(false)
 const successMessage = ref('')
+const errorMessage = ref('')
 
 const disabled = computed(() => {
   return (
@@ -97,12 +99,20 @@ const disabled = computed(() => {
 
 const submit = async () => {
   apiProcessing.value = true
-  const response = await axios.post('/api/v1/users', {
-    username: formState.username,
-    email: formState.email,
-    password: formState.password
-  })
+  errorMessage.value = ''
 
-  successMessage.value = response.data.message
+  try {
+    const response = await axios.post('/api/v1/users', {
+      username: formState.username,
+      email: formState.email,
+      password: formState.password
+    })
+
+    successMessage.value = response.data.message
+  } catch (error) {
+    errorMessage.value = 'Unexpected error occurred, please try again'
+  } finally {
+    apiProcessing.value = false
+  }
 }
 </script>

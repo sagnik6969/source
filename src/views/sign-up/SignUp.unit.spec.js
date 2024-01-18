@@ -56,7 +56,18 @@ describe('Sign Up', () => {
 
       describe('when there is an ongoing api call', () => {
         it('does not allow clicking the button', async () => {
-          axios.post.mockResolvedValue({ data: {} })
+          // axios.post.mockResolvedValue({ data: {} })
+          axios.post.mockImplementation(() => {
+            return new Promise((resolve) => {
+              setTimeout(() => {
+                resolve({ data: {} })
+              }, 1000)
+            })
+          })
+
+          // If we return immediately from axios.post button will bee enabled immediately
+          // which will allow user to click it again.
+
           const {
             user,
             elements: { signUpButton }
