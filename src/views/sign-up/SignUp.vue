@@ -5,7 +5,13 @@
         <h1>Sign Up</h1>
       </div>
 
-      <form class="card-body" @submit.prevent="submit">
+      <form
+        class="card-body"
+        @submit.prevent="submit"
+        data-testid="form-sign-up"
+        v-if="!successMessage"
+      >
+        <!-- data-testid => used for testing -->
         <div class="form-group">
           <label class="form-label" for="username">Username</label>
           <input
@@ -56,8 +62,8 @@
             Sign up
           </button>
         </div>
-        <div v-if="successMessage" class="alert alert-success">{{ successMessage }}</div>
       </form>
+      <div v-else class="alert alert-success">{{ successMessage }}</div>
     </div>
   </div>
 </template>

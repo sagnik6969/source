@@ -1,54 +1,9 @@
-// vi.mock('axios') // to test api calls
-// if the above line is not commented the test with msw will fail
-import { findByText, render, screen, waitFor } from '@testing-library/vue'
-import { describe, it, expect, vi, assert, beforeEach, beforeAll, afterAll } from 'vitest'
+import { render, screen, waitFor } from '@testing-library/vue'
+import { describe, it, expect } from 'vitest'
 import SignUp from './SignUp.vue'
 import userEvent from '@testing-library/user-event'
-import { setupServer } from 'msw/node'
-import { HttpResponse, delay, http } from 'msw'
-
-let requestBody
-let counter = 0
-const server = setupServer(
-  http.post('/api/v1/users', async ({ request }) => {
-    requestBody = await request.json()
-    counter += 1
-    return HttpResponse.json({ message: 'User create success' })
-  })
-)
-
-beforeEach(() => {
-  counter = 0
-  server.resetHandlers()
-  // to reset server.use before every test
-})
-
-beforeAll(() => server.listen())
-
-afterAll(() => server.close())
-
-const setup = async () => {
-  const user = userEvent.setup()
-  const result = render(SignUp)
-  const userName = screen.getByLabelText('Username')
-  const email = screen.getByLabelText('E-mail')
-  const password = screen.getByLabelText('Password')
-  const passwordRepeat = screen.getByLabelText('Password Repeat')
-  const signUpButton = screen.getByRole('button', { name: 'Sign up' })
-
-  await user.type(userName, 'test_user')
-  await user.type(email, 'text@example.com')
-  await user.type(password, 'asdf')
-  await user.type(passwordRepeat, 'asdf')
-
-  return {
-    ...result,
-    user,
-    elements: {
-      signUpButton
-    }
-  }
-}
+import { delay, http } from 'msw'
+import { setup, requestBody, counter, server } from './SignUp.spec'
 
 describe('sign up', () => {
   it('has signup header', () => {
@@ -64,7 +19,6 @@ describe('sign up', () => {
 
     // expect(container.querySelector('input')).toBeInTheDocument()
     // querySelector => same way as css
-
     // expect(screen.queryByPlaceholderText('Username')).toBeInTheDocument()
     expect(screen.queryByLabelText('Username')).toBeInTheDocument()
   })
@@ -74,7 +28,6 @@ describe('sign up', () => {
 
     // expect(container.querySelector('input[type="email"]')).toBeInTheDocument()
     // querySelector => same way as css
-
     // expect(screen.queryByPlaceholderText('E-mail')).toBeInTheDocument()
     expect(screen.queryByLabelText('E-mail')).toBeInTheDocument()
   })
@@ -164,8 +117,7 @@ describe('sign up', () => {
       it('displays spinner', async () => {
         server.use(
           http.post('/api/v1/users', async ({ request }) => {
-            // if we don't add the delay form will vanish immediately after completion of the request
-            // and we wont be able to capture the loading spinner.
+            // if we don't add the delay form will vanish immediately after
             await delay('infinite')
           })
         )
@@ -194,26 +146,6 @@ describe('sign up', () => {
         // by default waits for 1s for the element to appear.
         expect(text).toBeInTheDocument()
       })
-
-      it('hides signup form', async () => {
-        const {
-          user,
-          elements: { signUpButton }
-        } = await setup()
-
-        await user.click(signUpButton)
-
-        await waitFor(() => {
-          expect(screen.queryByTestId('form-sign-up')).not.toBeInTheDocument()
-        })
-      })
     })
   })
 })
-
-// https://testing-library.com/docs/queries/about
-// getBy vs queryBy
-// must read
-
-// if we use any library other than axios for api call the this test wont work for this we need
-// mock service worker. => sets up a mock server for testing.
