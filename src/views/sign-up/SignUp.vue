@@ -21,6 +21,7 @@
             placeholder="Username"
             type="text"
           />
+          <div class="text-danger">{{ errors.username }}</div>
         </div>
         <div class="form-group">
           <label class="form-label" for="email">E-mail</label>
@@ -88,6 +89,7 @@ const formState = reactive({
 const apiProcessing = ref(false)
 const successMessage = ref('')
 const errorMessage = ref('')
+const errors = ref({})
 
 const disabled = computed(() => {
   return (
@@ -110,7 +112,9 @@ const submit = async () => {
 
     successMessage.value = response.data.message
   } catch (error) {
-    errorMessage.value = 'Unexpected error occurred, please try again'
+    if (error.response?.status == 400) {
+      errors.value = error.response?.data?.validationErrors
+    } else errorMessage.value = 'Unexpected error occurred, please try again'
   } finally {
     apiProcessing.value = false
   }

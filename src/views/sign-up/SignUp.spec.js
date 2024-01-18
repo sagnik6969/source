@@ -276,6 +276,34 @@ describe('sign up', () => {
         })
       })
     })
+
+    describe('when username is invalid', () => {
+      it('displays validation error', async () => {
+        server.use(
+          http.post('/api/v1/users', ({ request }) => {
+            return HttpResponse.json(
+              {
+                validationErrors: {
+                  username: 'Username cannot be null'
+                }
+              },
+              { status: 400 }
+            )
+          })
+        )
+
+        const {
+          user,
+          elements: { signUpButton }
+        } = await setup()
+
+        await user.click(signUpButton)
+
+        const error = await screen.findByText('Username cannot be null')
+
+        expect(error).toBeInTheDocument()
+      })
+    })
   })
 })
 
