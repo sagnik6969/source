@@ -179,14 +179,18 @@ describe('Sign Up', () => {
         })
       })
 
-      describe('when username is invalid', () => {
-        it('displays validation error', async () => {
+      describe.each([
+        { field: 'username', message: 'username cant be null' },
+        { field: 'email', message: 'E-mail cant be null' },
+        { field: 'password', message: 'Password cant be null' }
+      ])('when $field is invalid', ({ field, message }) => {
+        it(`displays ${message}`, async () => {
           axios.post.mockRejectedValue({
             response: {
               status: 400,
               data: {
                 validationErrors: {
-                  username: 'Username cannot be null'
+                  [field]: message
                 }
               }
             }
@@ -199,7 +203,7 @@ describe('Sign Up', () => {
 
           await user.click(signUpButton)
 
-          const error = await screen.findByText('Username cannot be null')
+          const error = await screen.findByText(message)
 
           expect(error).toBeInTheDocument()
         })

@@ -4,10 +4,11 @@
     <input
       @input="$emit('update:modelValue', $event.target.value)"
       class="form-control"
+      :class="{ 'is-invalid': help }"
       :id="id"
-      type="text"
+      :type="type"
     />
-    <div class="text-danger">{{ help }}</div>
+    <span class="invalid-feedback">{{ help }}</span>
   </div>
 </template>
 
@@ -16,6 +17,7 @@ defineProps({
   label: String,
   id: String,
   help: String,
+  type: String,
   modelValue: String
 })
 

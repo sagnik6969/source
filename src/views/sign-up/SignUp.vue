@@ -28,18 +28,23 @@
           v-model="formState.username"
           label="Username"
           :help="errors.username"
+          type="text"
         />
-        <div class="form-group">
-          <label class="form-label" for="email">E-mail</label>
-          <input
-            class="form-control"
-            v-model="formState.email"
-            id="email"
-            placeholder="E-mail"
-            type="email"
-          />
-        </div>
-        <div class="form-group">
+        <AppInput
+          id="email"
+          v-model="formState.email"
+          label="E-mail"
+          :help="errors.email"
+          type="email"
+        />
+        <AppInput
+          id="password"
+          v-model="formState.password"
+          label="Password"
+          :help="errors.password"
+          type="password"
+        />
+        <!-- <div class="form-group">
           <label class="form-label" for="password">Password</label>
           <input
             class="form-control"
@@ -48,7 +53,7 @@
             placeholder="Password"
             type="password"
           />
-        </div>
+        </div> -->
         <div class="form-group">
           <label class="form-label" for="passwordRepeat">Password Repeat</label>
           <input
