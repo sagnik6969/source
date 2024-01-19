@@ -45,7 +45,9 @@ const setup = async () => {
     ...result,
     user,
     elements: {
-      signUpButton
+      signUpButton,
+      password,
+      passwordRepeat
     }
   }
 }
@@ -110,6 +112,20 @@ describe('sign up', () => {
     render(SignUp)
     expect(screen.queryByRole('status')).not.toBeInTheDocument()
     // spinner has a role attribute.
+  })
+
+  describe('when passwords do not match', () => {
+    it('displays error', async () => {
+      const {
+        user,
+        elements: { signUpButton, password, passwordRepeat }
+      } = await setup()
+
+      await user.type(password, 'abc')
+      await user.type(passwordRepeat, 'def')
+
+      expect(screen.getByText('Password mismatch')).toBeInTheDocument()
+    })
   })
 
   describe('when user sets same value for passwords inputs', () => {

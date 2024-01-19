@@ -44,16 +44,14 @@
           :help="errors.password"
           type="password"
         />
-        <!-- <div class="form-group">
-          <label class="form-label" for="password">Password</label>
-          <input
-            class="form-control"
-            id="password"
-            v-model="formState.password"
-            placeholder="Password"
-            type="password"
-          />
-        </div> -->
+        <AppInput
+          id="passwordRepeat"
+          v-model="formState.passwordRepeat"
+          label="Password Repeat"
+          :help="passwordMismatchError"
+          type="password"
+        />
+
         <div class="form-group">
           <label class="form-label" for="passwordRepeat">Password Repeat</label>
           <input
@@ -109,6 +107,10 @@ const disabled = computed(() => {
     formState.password === '' ||
     formState.password !== formState.passwordRepeat
   )
+})
+
+const passwordMismatchError = computed(() => {
+  return formState.password === formState.passwordRepeat ? undefined : 'Password mismatch'
 })
 
 const submit = async () => {
