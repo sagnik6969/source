@@ -225,11 +225,8 @@ describe('Sign Up', () => {
           })
 
           const { user, elements } = await setup()
-
           await user.click(elements.signUpButton)
-
           const error = await screen.findByText(message)
-
           await user.type(elements[`${field}`], 'updated')
           expect(error).not.toBeInTheDocument()
         })

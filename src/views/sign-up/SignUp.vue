@@ -2,7 +2,7 @@
   <div class="col-lg-6 offset-lg-3 col-md-8 offset-md-2 mt-5">
     <div class="card">
       <div class="card-header">
-        <h1>Sign Up</h1>
+        <h1>{{ $t('signUp') }}</h1>
       </div>
 
       <form
@@ -12,56 +12,34 @@
         v-if="!successMessage"
       >
         <!-- data-testid => used for testing -->
-        <!-- <div class="form-group">
-          <label class="form-label" for="username">Username</label>
-          <input
-            class="form-control"
-            v-model="formState.username"
-            id="username"
-            placeholder="Username"
-            type="text"
-          />
-          <div class="text-danger">{{ errors.username }}</div>
-        </div> -->
         <AppInput
           id="username"
           v-model="formState.username"
-          label="Username"
+          :label="$t('username')"
           :help="errors.username"
           type="text"
         />
         <AppInput
           id="email"
           v-model="formState.email"
-          label="E-mail"
+          :label="$t('email')"
           :help="errors.email"
           type="email"
         />
         <AppInput
           id="password"
           v-model="formState.password"
-          label="Password"
+          :label="$t('password')"
           :help="errors.password"
           type="password"
         />
         <AppInput
           id="passwordRepeat"
           v-model="formState.passwordRepeat"
-          label="Password Repeat"
+          :label="$t('passwordRepeat')"
           :help="passwordMismatchError"
           type="password"
         />
-
-        <div class="form-group">
-          <label class="form-label" for="passwordRepeat">Password Repeat</label>
-          <input
-            class="form-control"
-            id="passwordRepeat"
-            v-model="formState.passwordRepeat"
-            placeholder="Password"
-            type="password"
-          />
-        </div>
         <div class="form-group">
           <button class="btn btn-primary" :disabled="disabled">
             <span
@@ -69,7 +47,7 @@
               role="status"
               class="spinner-border spinner-border-sm"
             ></span>
-            Sign up
+            {{ $t('signUp') }}
           </button>
         </div>
       </form>
@@ -83,11 +61,9 @@
 import axios from 'axios'
 import { computed, reactive, ref, watch } from 'vue'
 import AppInput from '../../components/AppInput.vue'
+import { useI18n } from 'vue-i18n'
 
-// const password = ref('')
-// const passwordRepeat = ref('')
-// const username = ref('')
-// const email = ref('')
+const { t } = useI18n()
 
 const formState = reactive({
   password: '',
@@ -110,7 +86,7 @@ const disabled = computed(() => {
 })
 
 const passwordMismatchError = computed(() => {
-  return formState.password === formState.passwordRepeat ? undefined : 'Password mismatch'
+  return formState.password === formState.passwordRepeat ? undefined : t('passwordMismatch')
 })
 
 watch(
@@ -149,7 +125,7 @@ const submit = async () => {
   } catch (error) {
     if (error.response?.status == 400) {
       errors.value = error.response?.data?.validationErrors
-    } else errorMessage.value = 'Unexpected error occurred, please try again'
+    } else errorMessage.value = t('genericError')
   } finally {
     apiProcessing.value = false
   }

@@ -1,0 +1,9 @@
+{
+    "signUp": "Kayt Ol",
+    "username": "Kullanc Ad",
+    "email": "E-posta",
+    "password": "Şifre",
+    "passwordRepeat": "Şifre Tekrar",
+    "passwordMismatch": "Şifreniz eşleşmedi",
+    "genericError": "Beklenmedik bir hata oluştu, lütfen tekrar deneyin"
+  }
