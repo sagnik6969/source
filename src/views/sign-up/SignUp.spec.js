@@ -45,6 +45,8 @@ const setup = async () => {
     ...result,
     user,
     elements: {
+      username: userName,
+      email,
       signUpButton,
       password,
       passwordRepeat
@@ -323,6 +325,30 @@ describe('sign up', () => {
         const error = await screen.findByText(message)
 
         expect(error).toBeInTheDocument()
+      })
+
+      it(`clears the error after user updates ${field}`, async () => {
+        server.use(
+          http.post('/api/v1/users', ({ request }) => {
+            return HttpResponse.json(
+              {
+                validationErrors: {
+                  [field]: message
+                }
+              },
+              { status: 400 }
+            )
+          })
+        )
+
+        const { user, elements } = await setup()
+
+        await user.click(elements.signUpButton)
+
+        const error = await screen.findByText(message)
+
+        await user.type(elements[`${field}`], 'updated')
+        expect(error).not.toBeInTheDocument()
       })
     })
   })

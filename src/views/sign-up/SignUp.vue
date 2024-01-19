@@ -113,6 +113,27 @@ const passwordMismatchError = computed(() => {
   return formState.password === formState.passwordRepeat ? undefined : 'Password mismatch'
 })
 
+watch(
+  () => formState.username,
+  () => {
+    delete errors.value.username
+  }
+)
+
+watch(
+  () => formState.email,
+  () => {
+    delete errors.value.email
+  }
+)
+
+watch(
+  () => formState.password,
+  () => {
+    delete errors.value.password
+  }
+)
+
 const submit = async () => {
   apiProcessing.value = true
   errorMessage.value = ''

@@ -30,7 +30,11 @@ const setup = async () => {
     ...result,
     user,
     elements: {
-      signUpButton
+      username: userName,
+      email,
+      signUpButton,
+      password,
+      passwordRepeat
     }
   }
 }
@@ -206,6 +210,28 @@ describe('Sign Up', () => {
           const error = await screen.findByText(message)
 
           expect(error).toBeInTheDocument()
+        })
+
+        it(`clears the error after user updates ${field}`, async () => {
+          axios.post.mockRejectedValue({
+            response: {
+              status: 400,
+              data: {
+                validationErrors: {
+                  [field]: message
+                }
+              }
+            }
+          })
+
+          const { user, elements } = await setup()
+
+          await user.click(elements.signUpButton)
+
+          const error = await screen.findByText(message)
+
+          await user.type(elements[`${field}`], 'updated')
+          expect(error).not.toBeInTheDocument()
         })
       })
     })

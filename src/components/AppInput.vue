@@ -8,7 +8,7 @@
       :id="id"
       :type="type"
     />
-    <span class="invalid-feedback">{{ help }}</span>
+    <span v-if="help" class="invalid-feedback">{{ help }}</span>
   </div>
 </template>
 
