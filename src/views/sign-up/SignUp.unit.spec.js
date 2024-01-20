@@ -16,7 +16,10 @@ beforeEach(() => {
 })
 
 vi.mocked(useI18n).mockReturnValue({
-  t: (key) => en[key]
+  t: (key) => en[key],
+  locale: {
+    value: 'ab'
+  }
 })
 
 // the above and bellow code does exactly same work.
@@ -70,11 +73,19 @@ describe('Sign Up', () => {
         } = await setup()
 
         await user.click(signUpButton)
-        expect(axios.post).toHaveBeenCalledWith('/api/v1/users', {
-          username: 'test_user',
-          email: 'text@example.com',
-          password: 'asdf'
-        })
+        expect(axios.post).toHaveBeenCalledWith(
+          '/api/v1/users',
+          {
+            username: 'test_user',
+            email: 'text@example.com',
+            password: 'asdf'
+          },
+          {
+            headers: {
+              'Accept-Language': 'ab'
+            }
+          }
+        )
       })
 
       describe('when there is an ongoing api call', () => {

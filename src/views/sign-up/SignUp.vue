@@ -63,7 +63,7 @@ import { computed, reactive, ref, watch } from 'vue'
 import AppInput from '../../components/AppInput.vue'
 import { useI18n } from 'vue-i18n'
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
 
 const formState = reactive({
   password: '',
@@ -115,11 +115,19 @@ const submit = async () => {
   errorMessage.value = ''
 
   try {
-    const response = await axios.post('/api/v1/users', {
-      username: formState.username,
-      email: formState.email,
-      password: formState.password
-    })
+    const response = await axios.post(
+      '/api/v1/users',
+      {
+        username: formState.username,
+        email: formState.email,
+        password: formState.password
+      },
+      {
+        headers: {
+          'Accept-Language': locale.value
+        }
+      }
+    )
 
     successMessage.value = response.data.message
   } catch (error) {
