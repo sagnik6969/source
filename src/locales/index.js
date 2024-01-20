@@ -3,7 +3,7 @@ import en from './translations/en.json'
 import tr from './translations/tr.json'
 
 export const i18n = createI18n({
-  locale: 'tr',
+  locale: 'en',
   messages: {
     en,
     tr

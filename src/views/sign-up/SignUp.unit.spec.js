@@ -1,9 +1,12 @@
 vi.mock('axios')
+vi.mock('vue-i18n')
 import { render, screen, waitFor } from '@testing-library/vue'
 import SignUp from './SignUp.vue'
 import userEvent from '@testing-library/user-event'
 import axios from 'axios'
 import { beforeEach, expect, vi } from 'vitest'
+import { useI18n } from 'vue-i18n'
+import en from '../../locales/translations/en.json'
 
 beforeEach(() => {
   vi.clearAllMocks()
@@ -12,9 +15,25 @@ beforeEach(() => {
   // expect(axios.post).toHaveBeenCalledTimes(1) => this test will fail because axios is called twice in the 2 tests.
 })
 
+vi.mocked(useI18n).mockReturnValue({
+  t: (key) => en[key]
+})
+
+// the above and bellow code does exactly same work.
+// to mock a  function we first need to vi.mock('library name/path')
+
+// useI18n.mockReturnValue({
+//   t: (key) => en[key]
+// })
 const setup = async () => {
   const user = userEvent.setup()
-  const result = render(SignUp)
+  const result = render(SignUp, {
+    global: {
+      mocks: {
+        $t: (key) => en[key]
+      }
+    }
+  })
   const userName = screen.getByLabelText('Username')
   const email = screen.getByLabelText('E-mail')
   const password = screen.getByLabelText('Password')

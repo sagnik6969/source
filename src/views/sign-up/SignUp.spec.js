@@ -1,6 +1,6 @@
 // vi.mock('axios') // to test api calls
 // if the above line is not commented the test with msw will fail
-import { findByText, render, screen, waitFor } from '@testing-library/vue'
+import { findByText, render, screen, waitFor } from '../../../test/helper.js'
 import { describe, it, expect, vi, assert, beforeEach, beforeAll, afterAll } from 'vitest'
 import SignUp from './SignUp.vue'
 import userEvent from '@testing-library/user-event'
@@ -58,7 +58,7 @@ describe('sign up', () => {
   it('has signup header', () => {
     render(SignUp)
     // const element = screen.getByText('Sign Up')
-    const header = screen.getByRole('heading', { name: 'Sign Up' })
+    const header = screen.getByRole('heading', { name: 'Sign up' })
 
     expect(header).toBeInTheDocument()
   })
