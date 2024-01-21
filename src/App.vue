@@ -6,6 +6,8 @@ import LanguageSelector from './components/LanguageSelector.vue'
 <template>
   <main class="container">
     <LanguageSelector />
+    <router-link data-testid="link-home-page" to="/">Hoaxify</router-link>
+    <router-link data-testid="link-signup-page" to="/signup">{{ $t('signUp') }}</router-link>
     <!-- <SignUp /> -->
     <RouterView />
   </main>
