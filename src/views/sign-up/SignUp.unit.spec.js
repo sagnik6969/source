@@ -15,6 +15,11 @@ beforeEach(() => {
   // expect(axios.post).toHaveBeenCalledTimes(1) => this test will fail because axios is called twice in the 2 tests.
 })
 
+// clear_all_mocks vs reset_all_mocks
+// If you want to test mock function called times, clear before you use
+//If you want to make sure mock return value wouldn't pollute other test case, call reset
+// https://stackoverflow.com/a/66361187
+
 vi.mocked(useI18n).mockReturnValue({
   t: (key) => en[key],
   locale: {
