@@ -1,5 +1,6 @@
 import SignUp from '@/views/sign-up/SignUp.vue'
 import Home from '@/views/home/Home.vue'
+import Activation from '@/views/activation/Activation.vue'
 import { createRouter, createWebHistory } from 'vue-router'
 // import HomeView from '../views/HomeView.vue'
 
@@ -14,6 +15,10 @@ const router = createRouter({
     {
       path: '/signup',
       component: SignUp
+    },
+    {
+      path: '/activation/:token',
+      component: Activation
     }
   ]
 })

@@ -6,7 +6,8 @@ import userEvent from '@testing-library/user-event'
 describe('Routing', () => {
   describe.each([
     { path: '/', pageId: 'home-page' },
-    { path: '/signup', pageId: 'signup-page' }
+    { path: '/signup', pageId: 'signup-page' },
+    { path: '/activation/123', pageId: 'activation-page' }
   ])('when path is $path', ({ path, pageId }) => {
     it(`displays ${pageId}`, async () => {
       router.push(path)
