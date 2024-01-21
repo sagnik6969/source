@@ -6,7 +6,8 @@ import LanguageSelector from './components/LanguageSelector.vue'
 <template>
   <main class="container">
     <LanguageSelector />
-    <SignUp />
+    <!-- <SignUp /> -->
+    <RouterView />
   </main>
 </template>
 

@@ -1,5 +1,5 @@
 <template>
-  <div class="col-lg-6 offset-lg-3 col-md-8 offset-md-2 mt-5">
+  <div class="col-lg-6 offset-lg-3 col-md-8 offset-md-2 mt-5" data-testid="signup-page">
     <div class="card">
       <div class="card-header">
         <h1>{{ $t('signUp') }}</h1>
