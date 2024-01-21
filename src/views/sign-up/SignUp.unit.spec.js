@@ -1,4 +1,4 @@
-vi.mock('axios')
+vi.mock('./api.js')
 vi.mock('vue-i18n')
 import { render, screen, waitFor } from '@testing-library/vue'
 import SignUp from './SignUp.vue'
@@ -7,12 +7,12 @@ import axios from 'axios'
 import { beforeEach, expect, vi } from 'vitest'
 import { useI18n } from 'vue-i18n'
 import en from '../../locales/translations/en.json'
-
+import { signUp } from './api'
 beforeEach(() => {
   vi.clearAllMocks()
   // to clear the mock axios before each test.
   // if we don't clear the mock we will see unexpected results
-  // expect(axios.post).toHaveBeenCalledTimes(1) => this test will fail because axios is called twice in the 2 tests.
+  // expect(signUp).toHaveBeenCalledTimes(1) => this test will fail because axios is called twice in the 2 tests.
 })
 
 // clear_all_mocks vs reset_all_mocks
@@ -21,10 +21,7 @@ beforeEach(() => {
 // https://stackoverflow.com/a/66361187
 
 vi.mocked(useI18n).mockReturnValue({
-  t: (key) => en[key],
-  locale: {
-    value: 'ab'
-  }
+  t: (key) => en[key]
 })
 
 // the above and bellow code does exactly same work.
@@ -70,7 +67,7 @@ describe('Sign Up', () => {
   describe('when user sets same value for password inputs', () => {
     describe('when user submits form', () => {
       it('sends username, email, password to the backend', async () => {
-        axios.post.mockResolvedValue({ data: {} })
+        signUp.mockResolvedValue({ data: {} })
         // returns a response then axios calls post method during testing
         const {
           user,
@@ -78,25 +75,17 @@ describe('Sign Up', () => {
         } = await setup()
 
         await user.click(signUpButton)
-        expect(axios.post).toHaveBeenCalledWith(
-          '/api/v1/users',
-          {
-            username: 'test_user',
-            email: 'text@example.com',
-            password: 'asdf'
-          },
-          {
-            headers: {
-              'Accept-Language': 'ab'
-            }
-          }
-        )
+        expect(signUp).toHaveBeenCalledWith({
+          username: 'test_user',
+          email: 'text@example.com',
+          password: 'asdf'
+        })
       })
 
       describe('when there is an ongoing api call', () => {
         it('does not allow clicking the button', async () => {
-          // axios.post.mockResolvedValue({ data: {} })
-          axios.post.mockImplementation(() => {
+          // signUp.mockResolvedValue({ data: {} })
+          signUp.mockImplementation(() => {
             return new Promise((resolve) => {
               setTimeout(() => {
                 resolve({ data: {} })
@@ -104,7 +93,7 @@ describe('Sign Up', () => {
             })
           })
 
-          // If we return immediately from axios.post button will bee enabled immediately
+          // If we return immediately from signUp button will bee enabled immediately
           // which will allow user to click it again.
 
           const {
@@ -115,10 +104,10 @@ describe('Sign Up', () => {
           await user.click(signUpButton)
           await user.click(signUpButton)
 
-          expect(axios.post).toHaveBeenCalledTimes(1)
+          expect(signUp).toHaveBeenCalledTimes(1)
         })
         it('displays spinner', async () => {
-          axios.post.mockImplementation(() => {
+          signUp.mockImplementation(() => {
             return new Promise((resolve) => {
               setTimeout(() => {
                 resolve({ data: {} })
@@ -139,7 +128,7 @@ describe('Sign Up', () => {
 
       describe('when success response is received', () => {
         beforeEach(() => {
-          axios.post.mockResolvedValue({ data: { message: 'User create success' } })
+          signUp.mockResolvedValue({ data: { message: 'User create success' } })
         })
 
         it('displays message received from backend', async () => {
@@ -171,7 +160,7 @@ describe('Sign Up', () => {
 
       describe('when there is a network error', () => {
         beforeEach(() => {
-          axios.post.mockRejectedValue({})
+          signUp.mockRejectedValue({})
         })
 
         it('displays Unexpected error occurred, please try again', async () => {
@@ -199,7 +188,7 @@ describe('Sign Up', () => {
 
         describe('when user submits again', () => {
           it('hides the error when api request in progress', async () => {
-            axios.post.mockRejectedValueOnce({}).mockResolvedValue({ data: {} })
+            signUp.mockRejectedValueOnce({}).mockResolvedValue({ data: {} })
             // first time it will reject the promise after that it will resolve the promise
             const {
               user,
@@ -224,7 +213,7 @@ describe('Sign Up', () => {
         { field: 'password', message: 'Password cant be null' }
       ])('when $field is invalid', ({ field, message }) => {
         it(`displays ${message}`, async () => {
-          axios.post.mockRejectedValue({
+          signUp.mockRejectedValue({
             response: {
               status: 400,
               data: {
@@ -248,7 +237,7 @@ describe('Sign Up', () => {
         })
 
         it(`clears the error after user updates ${field}`, async () => {
-          axios.post.mockRejectedValue({
+          signUp.mockRejectedValue({
             response: {
               status: 400,
               data: {
