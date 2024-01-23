@@ -1,4 +1,9 @@
-import { describe, expect, it } from 'vitest'
+vi.mock('@/views/activation/Activation.vue')
+// The above will mock the functionality of Activation.vue
+// => it will search for mock file in the __mocks__ folder
+// in the actual file due to axios the test were
+// failing because in the test we are not returning any response
+import { describe, expect, it, vi } from 'vitest'
 import { render, router, screen, waitFor } from '../test/helper'
 import App from './App.vue'
 import userEvent from '@testing-library/user-event'
