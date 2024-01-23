@@ -4,9 +4,21 @@
 
 <script setup>
 import axios from 'axios'
-import { onMounted } from 'vue'
+import { onMounted, watch, watchEffect } from 'vue'
+import { useRoute } from 'vue-router'
 
-onMounted(() => {
-  axios.patch('/api/v1/users/:token/active')
-})
+const route = useRoute()
+
+// onMounted(() => {
+//   axios.patch(`/api/v1/users/${route.params.token}/active`)
+// })
+
+// watch(
+//   () => route.params.token,
+//   () => axios.patch(`/api/v1/users/${route.params.token}/active`)
+// )
+
+watchEffect(() => axios.patch(`/api/v1/users/${route.params.token}/active`))
+// watchEffect => replaces onMounted and watch when thr app loads and when route.params.token changes
+// the function will be reevaluated.
 </script>
