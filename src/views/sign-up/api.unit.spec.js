@@ -1,8 +1,9 @@
-vi.mock('axios')
+vi.mock('@/lib/http')
 import { describe, expect, vi } from 'vitest'
 import { i18n } from '@/locales/index.js'
 import { signUp } from './api'
 import axios from 'axios'
+import http from '@/lib/http'
 
 // vi.spyOn(i18n.global, 'locale', 'get').mockReturnValue('ab')
 // the above and bellow implementation works exactly the same
@@ -21,7 +22,7 @@ describe('signUp', () => {
     const body = { key: 'Value' }
     signUp(body)
 
-    expect(axios.post).toHaveBeenCalledWith('/api/v1/users', body, {
+    expect(http.post).toHaveBeenCalledWith('/api/v1/users', body, {
       headers: {
         'Accept-Language': 'ab'
       }

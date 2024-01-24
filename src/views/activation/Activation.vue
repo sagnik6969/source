@@ -6,7 +6,7 @@
 </template>
 
 <script setup>
-import axios from 'axios'
+import http from '../../lib/http.js'
 import { onMounted, ref, watch, watchEffect } from 'vue'
 import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
@@ -18,7 +18,6 @@ const route = useRoute()
 const apiProcessing = ref(false)
 const successMessage = ref('')
 const errorMessage = ref('')
-
 // onMounted(() => {
 //   axios.patch(`/api/v1/users/${route.params.token}/active`)
 // })
@@ -32,15 +31,7 @@ watchEffect(async () => {
   apiProcessing.value = true
 
   try {
-    const response = await axios.patch(
-      `/api/v1/users/${route.params.token}/active`,
-      {},
-      {
-        headers: {
-          'Accept-Language': locale.value
-        }
-      }
-    )
+    const response = await http.patch(`/api/v1/users/${route.params.token}/active`)
     successMessage.value = response.data.message
   } catch (error) {
     if (error.response?.status == 400) {
