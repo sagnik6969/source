@@ -3,6 +3,7 @@ import { render, router, screen, waitFor } from '../../../test/helper'
 import Activation from './Activation.vue'
 import { setupServer } from 'msw/node'
 import { HttpResponse, delay, http } from 'msw'
+import { i18n } from '@/locales'
 
 let counter = 0
 let token
@@ -106,8 +107,10 @@ describe('Activation', () => {
               })
             )
             await setUp('/activation/123')
-            waitFor(() =>
-              expect(screen.getByText('something went wrong please try later')).toBeInTheDocument()
+            await waitFor(() =>
+              expect(
+                screen.getByText('Unexpected error occurred, please try again')
+              ).toBeInTheDocument()
             )
           })
         })
@@ -128,6 +131,26 @@ describe('Activation', () => {
             await waitFor(() => expect(screen.getByText('asdf')).toBeInTheDocument())
           })
         })
+
+        describe.each([{ language: 'en' }, { language: 'tr' }])(
+          'when language is $language',
+          ({ language }) => {
+            let acceptLanguage
+            it(`sends request with ${language} in header`, async () => {
+              server.use(
+                http.patch('/api/v1/users/:token/active', ({ request }) => {
+                  acceptLanguage = request.headers.get('Accept-Language')
+                  return HttpResponse.json({})
+                })
+              )
+              i18n.global.locale = language
+
+              await setUp('/activation/123')
+
+              await waitFor(() => expect(acceptLanguage).toBe(language))
+            })
+          }
+        )
       })
     })
 })

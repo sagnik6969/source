@@ -9,6 +9,9 @@
 import axios from 'axios'
 import { onMounted, ref, watch, watchEffect } from 'vue'
 import { useRoute } from 'vue-router'
+import { useI18n } from 'vue-i18n'
+
+const { t, locale } = useI18n()
 
 const route = useRoute()
 
@@ -29,13 +32,21 @@ watchEffect(async () => {
   apiProcessing.value = true
 
   try {
-    const response = await axios.patch(`/api/v1/users/${route.params.token}/active`)
+    const response = await axios.patch(
+      `/api/v1/users/${route.params.token}/active`,
+      {},
+      {
+        headers: {
+          'Accept-Language': locale.value
+        }
+      }
+    )
     successMessage.value = response.data.message
   } catch (error) {
     if (error.response?.status == 400) {
       errorMessage.value = error.response?.data?.message
       // console.log(error.response.data.message)
-    } else errorMessage.value = 'something went wrong please try later'
+    } else errorMessage.value = t('genericError')
   }
 
   apiProcessing.value = false
