@@ -22,7 +22,8 @@
         />
 
         <div class="form-group">
-          <button class="btn btn-primary" :disabled="disabled">Password Reset</button>
+          <!-- <button class="btn btn-primary" :disabled="disabled">Password Reset</button> -->
+          <AppButton :is-disabled="disabled">Password Reset</AppButton>
         </div>
       </form>
       <div v-if="errorMessage" class="alert alert-success">{{ errorMessage }}</div>
@@ -31,7 +32,7 @@
   </div>
 </template>
 <script setup>
-import axios from 'axios'
+import AppButton from '@/components/AppButton.vue'
 import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute } from 'vue-router'

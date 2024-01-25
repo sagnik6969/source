@@ -41,14 +41,9 @@
           type="password"
         />
         <div class="form-group">
-          <button class="btn btn-primary" :disabled="disabled">
-            <span
-              v-if="apiProcessing"
-              role="status"
-              class="spinner-border spinner-border-sm"
-            ></span>
+          <AppButton :is-disabled="disabled" :api-progress="apiProcessing">
             {{ $t('signUp') }}
-          </button>
+          </AppButton>
         </div>
       </form>
       <div v-else class="alert alert-success">{{ successMessage }}</div>
@@ -60,6 +55,7 @@
 <script setup>
 import { computed, reactive, ref, watch } from 'vue'
 import AppInput from '../../components/AppInput.vue'
+import AppButton from '@/components/AppButton.vue'
 import { useI18n } from 'vue-i18n'
 import { signUp } from './api'
 const { t } = useI18n()
