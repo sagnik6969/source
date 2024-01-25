@@ -34,7 +34,7 @@ watchEffect(async () => {
     const response = await http.patch(`/api/v1/users/${route.params.token}/active`)
     successMessage.value = response.data.message
   } catch (error) {
-    if (error.response?.status == 400) {
+    if (error?.response?.status == 400) {
       errorMessage.value = error.response?.data?.message
       // console.log(error.response.data.message)
     } else errorMessage.value = t('genericError')

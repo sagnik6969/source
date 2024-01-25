@@ -2,6 +2,8 @@ import SignUp from '@/views/sign-up/SignUp.vue'
 import Home from '@/views/home/Home.vue'
 import Activation from '@/views/activation/Activation.vue'
 import { createRouter, createWebHistory } from 'vue-router'
+import Request from '@/views/password-reset/request/Request.vue'
+import Set from '@/views/password-reset/set/Set.vue'
 // import HomeView from '../views/HomeView.vue'
 
 const router = createRouter({
@@ -19,6 +21,14 @@ const router = createRouter({
     {
       path: '/activation/:token',
       component: Activation
+    },
+    {
+      path: '/password-reset/request',
+      component: Request
+    },
+    {
+      path: '/password-reset/set',
+      component: Set
     }
   ]
 })
