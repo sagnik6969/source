@@ -1,4 +1,5 @@
 vi.mock('@/views/activation/Activation.vue')
+vi.mock('@/views/home/components/UserList.vue')
 // The above will mock the functionality of Activation.vue
 // => it will search for mock file in the __mocks__ folder
 // in the actual file due to axios the test were
