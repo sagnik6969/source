@@ -16,3 +16,7 @@ app.mount('#app')
 
 // test file name is same as component name followed by .spec.js
 // npm run test:unit => to run tests
+
+// you can use reactive / ref inside tests
+// const f = vi.fn => to create a mock function => mainly to pass to a component which is under test.
+// we can assert different things in f like other vi.mocked() => functions.
