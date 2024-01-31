@@ -5,5 +5,10 @@
     "password": "Password",
     "passwordRepeat": "Password Repeat",
     "passwordMismatch": "Password mismatch",
-    "genericError": "Unexpected error occurred, please try again"
+    "genericError": "Unexpected error occurred, please try again",
+    "userList": {
+      "header": "Users",
+      "next": "Next",
+      "previous": "Previous"
+    }
   }

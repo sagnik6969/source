@@ -1,8 +1,9 @@
-import { HttpResponse, http } from 'msw'
+import { HttpResponse, delay, http } from 'msw'
 import { setupServer } from 'msw/node'
 import {afterAll, beforeAll, beforeEach, describe, expect, it} from 'vitest'
 import UserList from './UserList.vue'
-import { render, screen, waitFor } from '../../../../test/helper'
+import { render, router, screen, waitFor } from '../../../../test/helper'
+import userEvent from '@testing-library/user-event'
 
 const users = [
     {
@@ -42,12 +43,7 @@ const users = [
     }
   ]
 
-const page1 = {
-    content: users,
-    page: 0,
-    size: 3,
-    totalPages: 9
-  }
+
 
 const getPage = (page,size) => {
 
@@ -65,6 +61,7 @@ const getPage = (page,size) => {
 }
 
 const server = setupServer(http.get('/api/v1/users',({request})=>{
+    // console.log(request.url)
     let url = new URL(request.url);
     let page = Number.parseInt(url.searchParams.get('page'))
     let size = Number.parseInt(url.searchParams.get('size'))
@@ -87,5 +84,113 @@ describe('userList',() => {
         await waitFor(() =>expect(screen.queryAllByText(/user/).length).toBe(3))
     })
 
+    it('displays next page button',async() => {
+        render(UserList);
+        await screen.findByText('user1');
+        expect(screen.getByRole('button',{name:'Next'})).toBeInTheDocument();
+    })
 
+    it('doesnot display previous page button',async() => {
+        render(UserList);
+        await screen.findByText('user1');
+        expect(screen.queryByRole('button',{name:'Previous'})).not.toBeInTheDocument();
+    })
+
+    it('doesnot display spinner',async() => {
+        render(UserList);
+        await screen.findByText('user1');
+        expect(screen.queryByRole('status')).not.toBeInTheDocument();
+    })
+
+    describe('when user clicks next',() => {
+        it('displays next page',async() => {
+
+            const user = userEvent.setup();
+            render(UserList);
+            await screen.findByText('user1');
+            const button = screen.queryByRole('button',{name:'Next'});
+            await user.click(button);
+            const user4 = await screen.findByText('user4');
+            expect(user4).toBeInTheDocument();
+        })
+
+        it('displays previous page button',async() => {
+
+            const user = userEvent.setup();
+            render(UserList);
+            await screen.findByText('user1');
+            const button = screen.queryByRole('button',{name:'Next'});
+            await user.click(button);
+            const previousButton = await screen.findByRole('button',{name:'Previous'});
+            expect(previousButton).toBeInTheDocument();
+
+        })
+
+        describe('when user clicks previous',() => {
+            it('displays previous page',async() => {
+
+                const user = userEvent.setup();
+                render(UserList);
+                await screen.findByText('user1');
+                const button = screen.queryByRole('button',{name:'Next'});
+                await user.click(button);
+                const previousButton = await screen.findByRole('button',{name:'Previous'});
+                await user.click(previousButton);
+                const user1 = await screen.findByText('user1');
+                expect(user1).toBeInTheDocument();
+
+            })
+        })
+
+        describe('when last page is loaded',() => {
+            it('doesnot display the next button',async() => {
+
+                const user = userEvent.setup();
+                render(UserList);
+                await screen.findByText('user1');
+                const button = screen.queryByRole('button',{name:'Next'});
+                await user.click(button);
+                await screen.findByText('user4');
+                await user.click(button);
+                await screen.findByText('user7');
+                expect(button).not.toBeInTheDocument();
+            })
+        })
+    })
+
+    describe('when fetching user list for next or previous pages',() => {
+        it('displays spinner',async() => {
+
+            let resolveFunc;
+            const promise = new Promise((resolve,reject) => {
+                resolveFunc = resolve;
+            })
+            server.use(http.get('/api/v1/users',async()=>{
+               await promise;
+               return HttpResponse.json({});
+            }))
+
+            const user = userEvent.setup();
+
+            render(UserList);
+            const button = screen.getByRole('button',{name:'Next'});
+            await user.click(button);
+            expect(screen.queryByRole('status')).toBeInTheDocument();
+            await resolveFunc();
+            await waitFor(() => expect(screen.queryByRole('status')).not.toBeInTheDocument())
+
+        })
+    })
+
+    describe('when user clicks username',() => {
+        it('navigates to user page',async() => {
+            const user = userEvent.setup();
+            render(UserList);
+            const link = await screen.findByText('user1');
+            await user.click(link);
+            await waitFor(()=>{
+                expect(router.currentRoute.value.path).toBe('/user/1');
+            })
+        })
+    })
 })

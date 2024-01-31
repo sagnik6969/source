@@ -1,5 +1,6 @@
 vi.mock('@/views/activation/Activation.vue')
 vi.mock('@/views/home/components/UserList.vue')
+vi.mock('@/views/user/User.vue')
 // The above will mock the functionality of Activation.vue
 // => it will search for mock file in the __mocks__ folder
 // in the actual file due to axios the test were
@@ -15,7 +16,9 @@ describe('Routing', () => {
     { path: '/signup', pageId: 'signup-page' },
     { path: '/activation/123', pageId: 'activation-page' },
     { path: '/password-reset/request', pageId: 'password-reset-request-page' },
-    { path: '/password-reset/set', pageId: 'password-reset-set-page' }
+    { path: '/password-reset/set', pageId: 'password-reset-set-page' },
+    { path: '/user/1', pageId: 'user-page' },
+    { path: '/user/2', pageId: 'user-page' }
   ])('when path is $path', ({ path, pageId }) => {
     it(`displays ${pageId}`, async () => {
       router.push(path)
@@ -44,4 +47,20 @@ describe('Routing', () => {
         })
       })
     })
+
+  describe('when user is at the homepage', () => {
+    describe('when user clicks user name in user list', () => {
+      it('displays user page', async () => {
+        const user = userEvent.setup()
+        router.push('/')
+        await router.isReady()
+        render(App)
+        const link = await screen.findByText('user1')
+        await user.click(link)
+        await waitFor(() => {
+          expect(screen.getByTestId('user-page')).toBeInTheDocument()
+        })
+      })
+    })
+  })
 })
