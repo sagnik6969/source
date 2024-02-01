@@ -165,5 +165,45 @@ describe('Routing', () => {
         expect(router.currentRoute.value.path).toBe('/user/1')
       })
     })
+
+    it('stores logged in state in local storage', async () => {
+      router.push('/login')
+      await router.isReady()
+      render(App)
+      const user = userEvent.setup()
+      const password = screen.getByLabelText('Password')
+      const email = screen.getByLabelText('E-mail')
+      const button = screen.getByRole('button', { name: 'Log In' })
+
+      await user.type(password, 'abc')
+      await user.type(email, 'a@b.com')
+      expect(button).toBeEnabled()
+      await user.click(button)
+      await screen.findByTestId('home-page')
+
+      const state = JSON.parse(localStorage.getItem('auth'))
+      expect(state.id).toBe(1)
+      expect(state.username).toBe('user1')
+    })
+
+    describe('when local storage has auth data', () => {
+      it.only('displays logged in layout', async () => {
+        localStorage.setItem(
+          'auth',
+          JSON.stringify({ id: 1, username: 'user1', email: 'user1@mail.com' })
+        )
+
+        const user = userEvent.setup()
+        router.push('/')
+        await router.isReady()
+        render(App)
+
+        await waitFor(() => {
+          expect(screen.queryByTestId('link-signup-page')).not.toBeInTheDocument()
+          expect(screen.queryByTestId('link-login-page')).not.toBeInTheDocument()
+          expect(screen.queryByTestId('link-my-profile')).toBeInTheDocument()
+        })
+      })
+    })
   })
 })

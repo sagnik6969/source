@@ -5,5 +5,6 @@ expect.extend(matchers)
 
 afterEach(() => {
   i18n.global.locale = 'en'
+  localStorage.clear()
 })
 // vi.resetModules()
