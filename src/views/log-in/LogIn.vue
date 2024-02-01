@@ -47,6 +47,7 @@ import AppButton from '@/components/AppButton.vue'
 import { useI18n } from 'vue-i18n'
 import { LogIn } from './api'
 import { useRouter } from 'vue-router'
+import { useAuthStore } from '@/stores/auth'
 
 const { t } = useI18n()
 const router = useRouter()
@@ -54,6 +55,8 @@ const formState = reactive({
   password: '',
   email: ''
 })
+
+const { setLoggedIn } = useAuthStore()
 
 const apiProcessing = ref(false)
 const successMessage = ref('')
@@ -88,6 +91,8 @@ const submit = async () => {
       email: formState.email,
       password: formState.password
     })
+
+    setLoggedIn(response.data)
 
     router.push('/')
 

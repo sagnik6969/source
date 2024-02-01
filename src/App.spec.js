@@ -19,7 +19,7 @@ const server = setupServer(
   http.post('/api/v1/auth', async ({ request }) => {
     requestBody = await request.json()
     counter += 1
-    return HttpResponse.json({ message: 'User create success' })
+    return HttpResponse.json({ id: 1, username: 'user1', email: 'user1@mail.com', image: null })
   })
 )
 
@@ -122,6 +122,47 @@ describe('Routing', () => {
 
       await waitFor(() => {
         expect(screen.queryByTestId('home-page')).toBeInTheDocument()
+      })
+    })
+
+    it('hides the login and signup links', async () => {
+      router.push('/login')
+      await router.isReady()
+      render(App)
+      const user = userEvent.setup()
+      const password = screen.getByLabelText('Password')
+      const email = screen.getByLabelText('E-mail')
+      const button = screen.getByRole('button', { name: 'Log In' })
+
+      await user.type(password, 'abc')
+      await user.type(email, 'a@b.com')
+      expect(button).toBeEnabled()
+      await user.click(button)
+      await screen.findByTestId('home-page')
+
+      expect(screen.queryByTestId('link-signup-page')).not.toBeInTheDocument()
+      expect(screen.queryByTestId('link-login-page')).not.toBeInTheDocument()
+    })
+
+    describe('when user clicks My Profile', () => {
+      it('displays user page', async () => {
+        router.push('/login')
+        await router.isReady()
+        render(App)
+        const user = userEvent.setup()
+        const password = screen.getByLabelText('Password')
+        const email = screen.getByLabelText('E-mail')
+        const button = screen.getByRole('button', { name: 'Log In' })
+
+        await user.type(password, 'abc')
+        await user.type(email, 'a@b.com')
+        expect(button).toBeEnabled()
+        await user.click(button)
+        await screen.findByTestId('home-page')
+
+        await user.click(screen.queryByTestId('link-my-profile'))
+        await screen.findByTestId('user-page')
+        expect(router.currentRoute.value.path).toBe('/user/1')
       })
     })
   })
