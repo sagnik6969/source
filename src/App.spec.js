@@ -9,6 +9,7 @@ import { describe, expect, it, vi } from 'vitest'
 import { render, router, screen, waitFor } from '../test/helper'
 import App from './App.vue'
 import userEvent from '@testing-library/user-event'
+import LogIn from './views/log-in/LogIn.vue'
 
 describe('Routing', () => {
   describe.each([
@@ -61,6 +62,22 @@ describe('Routing', () => {
         await user.click(link)
         await waitFor(() => {
           expect(screen.getByTestId('user-page')).toBeInTheDocument()
+        })
+      })
+    })
+  })
+
+  describe('when user is at login page', () => {
+    describe('when user clicks forget password link', () => {
+      it('displays password request page', async () => {
+        const user = userEvent.setup()
+        router.push('/login')
+        await router.isReady()
+        render(LogIn)
+        const link = await screen.findByText('Forgot password?')
+        await user.click(link)
+        await waitFor(() => {
+          expect(screen.getByTestId('login-page')).toBeInTheDocument()
         })
       })
     })

@@ -11,5 +11,10 @@
       "header": "Kullanclar",
       "next": "Sonraki",
       "previous": "Önceki"
+    },
+    "passwordReset": {
+      "request": "Reset password",
+      "set": "Set password",
+      "forgot": "Forgot password?"
     }
   }

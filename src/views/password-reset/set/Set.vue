@@ -35,13 +35,15 @@
 import AppButton from '@/components/AppButton.vue'
 import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import AppInput from '../../../components/AppInput.vue'
 import http from '@/lib/http'
 const password = ref('')
 const passwordRepeat = ref('')
 const errors = ref({})
 const errorMessage = ref('')
+
+const router = useRouter()
 
 const { t } = useI18n()
 const route = useRoute()
@@ -65,6 +67,7 @@ const submit = async () => {
     await http.patch(`/api/v1/users/${route.query.tk}/password-reset`, {
       password: password.value
     })
+    router.push('/login')
   } catch (error) {
     if (error.response?.data?.validationErrors) {
       errors.value = error.response?.data?.validationErrors

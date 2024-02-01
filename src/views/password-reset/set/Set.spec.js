@@ -263,5 +263,29 @@ describe('password reset set page', () => {
         })
       }
     )
+
+    describe('when success message is received', () => {
+      it('navigates to login page', async () => {
+        server.use(
+          http.patch('/api/v1/users/:token/password-reset', ({ request }) => {
+            return HttpResponse.json({ message: 'password reset success' })
+          })
+        )
+
+        render(Set)
+        const user = userEvent.setup()
+        const password = screen.getByLabelText('Password')
+        const passwordRepeat = screen.getByLabelText('Password Repeat')
+        const button = screen.getByRole('button')
+
+        await user.type(password, 'abc')
+        await user.type(passwordRepeat, 'abc')
+        await user.click(button)
+
+        await waitFor(() => {
+          expect(router.currentRoute.value.path).toBe('/login')
+        })
+      })
+    })
   })
 })

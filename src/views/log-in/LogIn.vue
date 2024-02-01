@@ -33,6 +33,9 @@
       </form>
       <div v-else class="alert alert-success">{{ successMessage }}</div>
       <div v-if="errorMessage" class="alert alert-success">{{ errorMessage }}</div>
+      <div class="card-footer">
+        <router-link to="/password-reset/request">{{ $t('passwordReset.forgot') }}</router-link>
+      </div>
     </div>
   </div>
 </template>
