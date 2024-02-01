@@ -4,6 +4,7 @@ import Activation from '@/views/activation/Activation.vue'
 import { createRouter, createWebHistory } from 'vue-router'
 import Request from '@/views/password-reset/request/Request.vue'
 import Set from '@/views/password-reset/set/Set.vue'
+import LogIn from '@/views/log-in/LogIn.vue'
 // import HomeView from '../views/HomeView.vue'
 import User from '@/views/user/User.vue'
 const router = createRouter({
@@ -33,6 +34,10 @@ const router = createRouter({
     {
       path: '/user/:id',
       component: User
+    },
+    {
+      path: '/login',
+      component: LogIn
     }
   ]
 })

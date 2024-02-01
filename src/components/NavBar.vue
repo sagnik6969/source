@@ -10,6 +10,9 @@
           <router-link class="nav-link" data-testid="link-signup-page" to="/signup">{{
             $t('signUp')
           }}</router-link>
+          <router-link class="nav-link" data-testid="link-login-page" to="/login">{{
+            $t('LogIn')
+          }}</router-link>
         </li>
       </ul>
     </div>
