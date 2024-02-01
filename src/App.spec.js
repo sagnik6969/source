@@ -5,11 +5,33 @@ vi.mock('@/views/user/User.vue')
 // => it will search for mock file in the __mocks__ folder
 // in the actual file due to axios the test were
 // failing because in the test we are not returning any response
-import { describe, expect, it, vi } from 'vitest'
+import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 import { render, router, screen, waitFor } from '../test/helper'
 import App from './App.vue'
 import userEvent from '@testing-library/user-event'
 import LogIn from './views/log-in/LogIn.vue'
+import { setupServer } from 'msw/node'
+import { HttpResponse, http } from 'msw'
+
+let requestBody
+let counter = 0
+const server = setupServer(
+  http.post('/api/v1/auth', async ({ request }) => {
+    requestBody = await request.json()
+    counter += 1
+    return HttpResponse.json({ message: 'User create success' })
+  })
+)
+
+beforeEach(() => {
+  counter = 0
+  server.resetHandlers()
+  // to reset server.use before every test
+})
+
+beforeAll(() => server.listen())
+
+afterAll(() => server.close())
 
 describe('Routing', () => {
   describe.each([
@@ -79,6 +101,27 @@ describe('Routing', () => {
         await waitFor(() => {
           expect(screen.getByTestId('login-page')).toBeInTheDocument()
         })
+      })
+    })
+  })
+
+  describe('when login is successFull', () => {
+    it('it navigates to homepage', async () => {
+      router.push('/login')
+      await router.isReady()
+      render(App)
+      const user = userEvent.setup()
+      const password = screen.getByLabelText('Password')
+      const email = screen.getByLabelText('E-mail')
+      const button = screen.getByRole('button', { name: 'Log In' })
+
+      await user.type(password, 'abc')
+      await user.type(email, 'a@b.com')
+      expect(button).toBeEnabled()
+      await user.click(button)
+
+      await waitFor(() => {
+        expect(screen.queryByTestId('home-page')).toBeInTheDocument()
       })
     })
   })

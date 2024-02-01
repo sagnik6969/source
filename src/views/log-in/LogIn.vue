@@ -46,8 +46,10 @@ import AppInput from '../../components/AppInput.vue'
 import AppButton from '@/components/AppButton.vue'
 import { useI18n } from 'vue-i18n'
 import { LogIn } from './api'
-const { t } = useI18n()
+import { useRouter } from 'vue-router'
 
+const { t } = useI18n()
+const router = useRouter()
 const formState = reactive({
   password: '',
   email: ''
@@ -86,6 +88,8 @@ const submit = async () => {
       email: formState.email,
       password: formState.password
     })
+
+    router.push('/')
 
     successMessage.value = response.data.message
   } catch (error) {
