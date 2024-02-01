@@ -22,12 +22,26 @@
           data-testid="link-my-profile"
         ></router-link>
       </li>
+      <li>
+        <span class="nav-link" data-testid="link-logout" role="button" @click="logout">
+          Log Out
+        </span>
+      </li>
     </div>
   </nav>
 </template>
 
 <script setup>
+import http from '@/lib/http'
 import { useAuthStore } from '@/stores/auth'
 
-const { auth } = useAuthStore()
+const { auth, logout: logoutStore } = useAuthStore()
+
+const logout = async () => {
+  logoutStore()
+
+  try {
+    await http.post('/api/v1/logout')
+  } catch {}
+}
 </script>

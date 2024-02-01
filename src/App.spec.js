@@ -15,16 +15,22 @@ import { HttpResponse, http } from 'msw'
 
 let requestBody
 let counter = 0
+let logoutCount = 0
 const server = setupServer(
   http.post('/api/v1/auth', async ({ request }) => {
     requestBody = await request.json()
     counter += 1
     return HttpResponse.json({ id: 1, username: 'user1', email: 'user1@mail.com', image: null })
+  }),
+  http.post('/api/v1/logout', () => {
+    logoutCount++
+    return HttpResponse.json({})
   })
 )
 
 beforeEach(() => {
   counter = 0
+  logoutCount = 0
   server.resetHandlers()
   // to reset server.use before every test
 })
@@ -187,7 +193,7 @@ describe('Routing', () => {
     })
 
     describe('when local storage has auth data', () => {
-      it.only('displays logged in layout', async () => {
+      it('displays logged in layout', async () => {
         localStorage.setItem(
           'auth',
           JSON.stringify({ id: 1, username: 'user1', email: 'user1@mail.com' })
@@ -202,6 +208,42 @@ describe('Routing', () => {
           expect(screen.queryByTestId('link-signup-page')).not.toBeInTheDocument()
           expect(screen.queryByTestId('link-login-page')).not.toBeInTheDocument()
           expect(screen.queryByTestId('link-my-profile')).toBeInTheDocument()
+        })
+      })
+
+      describe('when user clicks logout', () => {
+        it('displays login and signup links', async () => {
+          localStorage.setItem(
+            'auth',
+            JSON.stringify({ id: 1, username: 'user1', email: 'user1@mail.com' })
+          )
+
+          const user = userEvent.setup()
+          router.push('/')
+          await router.isReady()
+          render(App)
+          await user.click(screen.getByTestId('link-logout'))
+
+          expect(screen.queryByTestId('link-signup-page')).toBeInTheDocument()
+          expect(screen.queryByTestId('link-login-page')).toBeInTheDocument()
+          expect(screen.queryByTestId('link-my-profile')).not.toBeInTheDocument()
+        })
+
+        it('sends logout request to server', async () => {
+          localStorage.setItem(
+            'auth',
+            JSON.stringify({ id: 1, username: 'user1', email: 'user1@mail.com' })
+          )
+
+          const user = userEvent.setup()
+          router.push('/')
+          await router.isReady()
+          render(App)
+          await user.click(screen.getByTestId('link-logout'))
+
+          await waitFor(() => {
+            expect(logoutCount).toBe(1)
+          })
         })
       })
     })
