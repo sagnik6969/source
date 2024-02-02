@@ -20,6 +20,7 @@ export const useAuthStore = defineStore('auth', () => {
     auth.id = data.id
     auth.username = data.username
     auth.email = data.email
+    // console.log(data)
   }
 
   function logout() {

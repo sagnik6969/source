@@ -27,6 +27,12 @@
           Log Out
         </span>
       </li>
+      <li v-if="auth.id != 0" data-testid="user-nav">
+        {{ auth.username }}
+      </li>
+      <li v-if="auth.id != 0" data-testid="profile-img-nav">
+        <img src="@/assets/profile.png" alt="" />
+      </li>
     </div>
   </nav>
 </template>

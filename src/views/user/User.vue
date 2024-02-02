@@ -4,14 +4,32 @@
       <template v-slot:header> User Page </template>
       <template v-slot:default> <img src="@/assets/profile.png" alt="" /> </template>
       <template v-if="status === 'success'" v-slot:footer>
-        {{ data.username }}
-        <button v-if="auth.id === data.id" @click="deleteUser" :disabled="apiProcessing">
-          Delete
-        </button>
-        <span v-if="apiProcessing" role="status" class="spinner-border spinner-border-sm"></span>
+        <div v-if="!editFormVisible">
+          <span>
+            {{ data.username }}
+          </span>
+          <button v-if="auth.id === data.id" @click="deleteUser" :disabled="apiProcessing">
+            Delete
+          </button>
+          <button v-if="auth.id === data.id" @click="editFormVisible = true">Edit</button>
+          <!-- <span v-if="apiProcessing" role="status" class="spinner-border spinner-border-sm"></span> -->
+        </div>
+        <div v-else>
+          <form @submit.prevent="updateUser">
+            <label for="username">Username</label>
+            <input type="text" name="username" id="username" v-model="UpdatedUser" />
+            <span v-if="updateUserValidationError" class="text-danger">{{
+              updateUserValidationError
+            }}</span>
+            <button type="submit" :disabled="apiProcessing">Save</button>
+            <button type="button" @click="editFormVisible = false" :disabled="apiProcessing">
+              Cancel
+            </button>
+          </form>
+        </div>
       </template>
     </Card>
-    <div v-if="status === 'loading'">
+    <div v-if="status === 'loading' || apiProcessing">
       <span role="status" class="spinner-border spinner-border-sm"></span>
     </div>
     <div v-if="status === 'fail'" class="alert alert-success">
@@ -20,24 +38,49 @@
     <div v-if="deleteUserError" class="alert alert-success">
       {{ deleteUserError }}
     </div>
+    <div v-if="updateUserError" class="alert alert-success">
+      {{ updateUserError }}
+    </div>
   </div>
 </template>
 
 <script setup>
 import Card from '@/components/Card.vue'
 import http from '@/lib/http'
-const { auth, logout } = useAuthStore()
+
+const editFormVisible = ref(false)
+const { auth, logout, setLoggedIn } = useAuthStore()
 const getUserById = async (id) => {
   return await http.get(`/api/v1/users/${id}`)
 }
 
 import useRouteParamApiRequest from '@/shared/useRouteParamApiRequest.js'
 import { useAuthStore } from '@/stores/auth'
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
+
 // import { router } from '../../../test/helper'
 const { status, data, error } = useRouteParamApiRequest(getUserById, 'id')
+
+const UpdatedUser = ref('')
+
+watch(
+  () => UpdatedUser.value,
+  () => {
+    updateUserValidationError.value = ''
+  }
+)
+
+watch(
+  () => data.value,
+  () => {
+    UpdatedUser.value = data.value.username
+  }
+)
+
+// console.log(UpdatedUser.value)
+
 const { t } = useI18n()
 const router = useRouter()
 const apiProcessing = ref(false)
@@ -57,5 +100,33 @@ const deleteUser = async () => {
 
     apiProcessing.value = false
   }
+}
+
+const updateUserError = ref('')
+const updateUserValidationError = ref('')
+
+const updateUser = async () => {
+  apiProcessing.value = true
+  updateUserError.value = ''
+  try {
+    await http.put(`/api/v1/users/${data.value.id}`, {
+      username: UpdatedUser.value
+    })
+    setLoggedIn({
+      id: data.value.id,
+      username: UpdatedUser.value,
+      email: data.value.email
+    })
+    data.value.username = UpdatedUser.value
+    editFormVisible.value = false
+  } catch (error) {
+    if (error.response?.status == 400) {
+      updateUserValidationError.value = error.response.data.validationErrors.username
+    } else {
+      updateUserError.value = t('genericError')
+    }
+  }
+
+  apiProcessing.value = false
 }
 </script>

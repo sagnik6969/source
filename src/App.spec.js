@@ -247,5 +247,37 @@ describe('Routing', () => {
         })
       })
     })
+
+    it('display username on navbar', async () => {
+      localStorage.setItem(
+        'auth',
+        JSON.stringify({ id: 1, username: 'user1', email: 'user1@mail.com' })
+      )
+
+      const user = userEvent.setup()
+      router.push('/')
+      await router.isReady()
+      render(App)
+
+      await waitFor(() => {
+        expect(screen.getByTestId('user-nav').innerHTML).toBe('user1')
+      })
+    })
+
+    it('displays profile image in navbar', async () => {
+      localStorage.setItem(
+        'auth',
+        JSON.stringify({ id: 1, username: 'user1', email: 'user1@mail.com' })
+      )
+
+      const user = userEvent.setup()
+      router.push('/')
+      await router.isReady()
+      render(App)
+
+      await waitFor(() => {
+        expect(screen.getByTestId('profile-img-nav')).toBeInTheDocument()
+      })
+    })
   })
 })
