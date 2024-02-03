@@ -7,11 +7,15 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "test:unit": "vitest",
+    "test": "vitest",
+    "test:coverage":"vitest --coverage --watch=false",
+    "test:int":"vitest --config=./vitest.int.config.js",
+    "test:unit":"vitest --config=./vitest.unit.config.js",
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs --fix --ignore-path .gitignore",
     "format": "prettier --write src/"
   },
   "dependencies": {
+    "@vitest/coverage-istanbul": "^0.34.6",
     "axios": "^1.6.5",
     "bootstrap": "^4.6.2",
     "pinia": "^2.1.7",
