@@ -1180,6 +1180,77 @@ describe('user page', () => {
             expect(screen.getByAltText('user-image')).toHaveAttribute('src', 'uploaded-image.png')
           })
         })
+        describe('when image is invalid', () => {
+          it('displays validation error', async () => {
+            server.use(
+              http.put('/api/v1/users/:id', () => {
+                return HttpResponse.json(
+                  {
+                    validationErrors: {
+                      image: 'Only png or jpeg files are allowed'
+                    }
+                  },
+                  { status: 400 }
+                )
+              })
+            )
+
+            localStorage.setItem('auth', JSON.stringify({ id: 1, username: 'user1' }))
+            const user = userEvent.setup()
+            router.push(`/user/1`)
+            await router.isReady()
+            render(User)
+            const editButton = await screen.findByRole('button', { name: 'Edit' })
+            await user.click(editButton)
+            const fileUploadInput = screen.getByLabelText('Select Image')
+
+            await user.upload(
+              fileUploadInput,
+              new File(['hello'], 'hello.png', { type: 'image/png' })
+            )
+            await user.click(screen.getByRole('button', { name: 'Save' }))
+
+            await waitFor(() => {
+              expect(screen.getByText('Only png or jpeg files are allowed')).toBeInTheDocument()
+            })
+          })
+
+          it('clears validation error when user selects new image', async () => {
+            server.use(
+              http.put('/api/v1/users/:id', () => {
+                return HttpResponse.json(
+                  {
+                    validationErrors: {
+                      image: 'Only png or jpeg files are allowed'
+                    }
+                  },
+                  { status: 400 }
+                )
+              })
+            )
+
+            localStorage.setItem('auth', JSON.stringify({ id: 1, username: 'user1' }))
+            const user = userEvent.setup()
+            router.push(`/user/1`)
+            await router.isReady()
+            render(User)
+            const editButton = await screen.findByRole('button', { name: 'Edit' })
+            await user.click(editButton)
+            const fileUploadInput = screen.getByLabelText('Select Image')
+
+            await user.upload(
+              fileUploadInput,
+              new File(['hello'], 'hello.png', { type: 'image/png' })
+            )
+            await user.click(screen.getByRole('button', { name: 'Save' }))
+
+            const error = await screen.findByText('Only png or jpeg files are allowed')
+
+            await user.upload(fileUploadInput, new File(['hi'], 'hi.png', { type: 'image/png' }))
+
+            expect(error).not.toBeInTheDocument()
+          })
+        })
       })
     })
   })

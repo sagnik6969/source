@@ -20,8 +20,8 @@
           <form @submit.prevent="updateUser" enctype="multipart/form-data">
             <label for="username">Username</label>
             <input type="text" name="username" id="username" v-model="UpdatedUser" />
-            <span v-if="updateUserValidationError" class="text-danger">{{
-              updateUserValidationError
+            <span v-if="updateUserValidationError.username" class="text-danger">{{
+              updateUserValidationError.username
             }}</span>
             <label for="file-upload">Select Image</label>
             <input
@@ -30,6 +30,9 @@
               name="file-upload"
               @change="onImageChange($event)"
             />
+            <span v-if="updateUserValidationError.image" class="text-danger">{{
+              updateUserValidationError.image
+            }}</span>
             <button type="submit" :disabled="apiProcessing">Save</button>
             <button
               type="button"
@@ -83,12 +86,9 @@ const { status, data, error } = useRouteParamApiRequest(getUserById, 'id')
 
 const UpdatedUser = ref('')
 
-watch(
-  () => UpdatedUser.value,
-  () => {
-    updateUserValidationError.value = ''
-  }
-)
+watch([UpdatedUser], () => {
+  updateUserValidationError.value = {}
+})
 
 watch(
   () => data.value,
@@ -121,7 +121,7 @@ const deleteUser = async () => {
 }
 
 const updateUserError = ref('')
-const updateUserValidationError = ref('')
+const updateUserValidationError = ref({})
 
 const updateUser = async () => {
   apiProcessing.value = true
@@ -143,7 +143,7 @@ const updateUser = async () => {
     editFormVisible.value = false
   } catch (error) {
     if (error.response?.status == 400) {
-      updateUserValidationError.value = error.response.data.validationErrors.username
+      updateUserValidationError.value = error.response.data.validationErrors
     } else {
       updateUserError.value = t('genericError')
     }
@@ -153,6 +153,8 @@ const updateUser = async () => {
 }
 
 const tempImage = ref()
+
+watch(tempImage, () => (updateUserValidationError.value = {}))
 
 const onImageChange = (event) => {
   const file = event.target.files[0]
