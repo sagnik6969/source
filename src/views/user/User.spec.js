@@ -1071,7 +1071,55 @@ describe('user page', () => {
           render(User)
           const editButton = await screen.findByRole('button', { name: 'Edit' })
           await user.click(editButton)
-          expect(screen.getByLabelText('Select Image')).toBeInTheDocument()
+          const fileUploadInput = screen.getByLabelText('Select Image')
+          expect(fileUploadInput).toBeInTheDocument()
+          expect(fileUploadInput).toHaveAttribute('type', 'file')
+        })
+
+        describe('when user selects a photo', () => {
+          it('displays it in existing profile image', async () => {
+            localStorage.setItem('auth', JSON.stringify({ id: 1, username: 'user1' }))
+            const user = userEvent.setup()
+            router.push(`/user/1`)
+            await router.isReady()
+            render(User)
+            const editButton = await screen.findByRole('button', { name: 'Edit' })
+            await user.click(editButton)
+            const fileUploadInput = screen.getByLabelText('Select Image')
+
+            await user.upload(
+              fileUploadInput,
+              new File(['hello'], 'hello.png', { type: 'image/png' })
+            )
+            const image = screen.getByAltText('user-image')
+            await waitFor(() => {
+              expect(image).toHaveAttribute('src', 'data:image/png;base64,aGVsbG8=')
+            })
+          })
+
+          describe('when user clicks cancel button', () => {
+            it('displays default image', async () => {
+              localStorage.setItem('auth', JSON.stringify({ id: 1, username: 'user1' }))
+              const user = userEvent.setup()
+              router.push(`/user/1`)
+              await router.isReady()
+              render(User)
+              const editButton = await screen.findByRole('button', { name: 'Edit' })
+              await user.click(editButton)
+              const fileUploadInput = screen.getByLabelText('Select Image')
+
+              await user.upload(
+                fileUploadInput,
+                new File(['hello'], 'hello.png', { type: 'image/png' })
+              )
+              await user.click(screen.getByRole('button', { name: 'Cancel' }))
+
+              const image = screen.getByAltText('user-image')
+              await waitFor(() => {
+                expect(image).not.toHaveAttribute('src', 'data:image/png;base64,aGVsbG8=')
+              })
+            })
+          })
         })
       })
     })

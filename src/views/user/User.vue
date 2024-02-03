@@ -2,7 +2,9 @@
   <div data-testid="user-page">
     <Card>
       <template v-slot:header> User Page </template>
-      <template v-slot:default> <img src="@/assets/profile.png" alt="" /> </template>
+      <template v-slot:default>
+        <img :src="tempImage || '@/assets/profile.png'" alt="user-image" />
+      </template>
       <template v-if="status === 'success'" v-slot:footer>
         <div v-if="!editFormVisible">
           <span>
@@ -15,14 +17,30 @@
           <!-- <span v-if="apiProcessing" role="status" class="spinner-border spinner-border-sm"></span> -->
         </div>
         <div v-else>
-          <form @submit.prevent="updateUser">
+          <form @submit.prevent="updateUser" enctype="multipart/form-data">
             <label for="username">Username</label>
             <input type="text" name="username" id="username" v-model="UpdatedUser" />
             <span v-if="updateUserValidationError" class="text-danger">{{
               updateUserValidationError
             }}</span>
+            <label for="file-upload">Select Image</label>
+            <input
+              type="file"
+              id="file-upload"
+              name="file-upload"
+              @change="onImageChange($event)"
+            />
             <button type="submit" :disabled="apiProcessing">Save</button>
-            <button type="button" @click="editFormVisible = false" :disabled="apiProcessing">
+            <button
+              type="button"
+              @click="
+                () => {
+                  editFormVisible = false
+                  tempImage = undefined
+                }
+              "
+              :disabled="apiProcessing"
+            >
               Cancel
             </button>
           </form>
@@ -128,5 +146,18 @@ const updateUser = async () => {
   }
 
   apiProcessing.value = false
+}
+
+const tempImage = ref()
+
+const onImageChange = (event) => {
+  const file = event.target.files[0]
+  const fileReader = new FileReader()
+  fileReader.onloadend = () => {
+    const data = fileReader.result
+    tempImage.value = data
+  }
+
+  fileReader.readAsDataURL(file)
 }
 </script>
