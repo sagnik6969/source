@@ -20,6 +20,7 @@ export const useAuthStore = defineStore('auth', () => {
     auth.id = data.id
     auth.username = data.username
     auth.email = data.email
+    auth.image = data.image
     // console.log(data)
   }
 

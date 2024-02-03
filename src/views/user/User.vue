@@ -3,7 +3,7 @@
     <Card>
       <template v-slot:header> User Page </template>
       <template v-slot:default>
-        <img :src="tempImage || '@/assets/profile.png'" alt="user-image" />
+        <img :src="tempImage || auth.image || '@/assets/profile.png'" alt="user-image" />
       </template>
       <template v-if="status === 'success'" v-slot:footer>
         <div v-if="!editFormVisible">
@@ -127,14 +127,18 @@ const updateUser = async () => {
   apiProcessing.value = true
   updateUserError.value = ''
   try {
-    await http.put(`/api/v1/users/${data.value.id}`, {
-      username: UpdatedUser.value
+    const response = await http.put(`/api/v1/users/${data.value.id}`, {
+      username: UpdatedUser.value,
+      ...(tempImage.value && { image: tempImage.value?.split(',')[1] })
     })
+    tempImage.value = undefined
     setLoggedIn({
       id: data.value.id,
       username: UpdatedUser.value,
-      email: data.value.email
+      email: data.value,
+      image: response.data.image
     })
+    // console.log(auth)
     data.value.username = UpdatedUser.value
     editFormVisible.value = false
   } catch (error) {

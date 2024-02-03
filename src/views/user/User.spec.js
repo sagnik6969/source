@@ -1120,6 +1120,65 @@ describe('user page', () => {
               })
             })
           })
+
+          it('sends request with image', async () => {
+            let requestBody
+            server.use(
+              http.put('/api/v1/users/:id', async ({ params, request }) => {
+                requestBody = await request.json()
+              })
+            )
+
+            localStorage.setItem('auth', JSON.stringify({ id: 1, username: 'user1' }))
+            const user = userEvent.setup()
+            router.push(`/user/1`)
+            await router.isReady()
+            render(User)
+            const editButton = await screen.findByRole('button', { name: 'Edit' })
+            await user.click(editButton)
+            const fileUploadInput = screen.getByLabelText('Select Image')
+
+            await user.upload(
+              fileUploadInput,
+              new File(['hello'], 'hello.png', { type: 'image/png' })
+            )
+            await user.click(screen.getByRole('button', { name: 'Save' }))
+
+            await waitFor(() => {
+              // console.log(requestBody)
+              expect(requestBody).toStrictEqual({
+                username: 'user1',
+                image: 'aGVsbG8='
+              })
+            })
+          })
+        })
+
+        it('displays image served from backend', async () => {
+          server.use(
+            http.put('/api/v1/users/:id', async ({ params, request }) => {
+              return HttpResponse.json({ username: 'user3', image: 'uploaded-image.png' })
+            })
+          )
+
+          localStorage.setItem('auth', JSON.stringify({ id: 1, username: 'user1' }))
+          const user = userEvent.setup()
+          router.push(`/user/1`)
+          await router.isReady()
+          render(User)
+          const editButton = await screen.findByRole('button', { name: 'Edit' })
+          await user.click(editButton)
+          const fileUploadInput = screen.getByLabelText('Select Image')
+
+          await user.upload(
+            fileUploadInput,
+            new File(['hello'], 'hello.png', { type: 'image/png' })
+          )
+          await user.click(screen.getByRole('button', { name: 'Save' }))
+
+          await waitFor(() => {
+            expect(screen.getByAltText('user-image')).toHaveAttribute('src', 'uploaded-image.png')
+          })
         })
       })
     })
